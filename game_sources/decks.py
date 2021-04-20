@@ -19,16 +19,16 @@ class Deck:
 
         for _ in range(2, cards_needed):
             if _ == 11:
-                card_value_string = "Bube"
+                card_value_string = "Jack"
                 card_value_int = 10
             elif _ == 12:
                 card_value_string = "Dame"
                 card_value_int = 10
             elif _ == 13:
-                card_value_string = "König"
+                card_value_string = "King"
                 card_value_int = 10
             elif _ == 14:
-                card_value_string = "Ass"
+                card_value_string = "Ace"
                 card_value_int = 11
             else:
                 card_value_int = _
@@ -37,11 +37,11 @@ class Deck:
             # problem: bube dame könig -> 10 - ass 1 || 11
 
             self._cards.append(
-                Card("Herz", card_value_string, card_value_int)
+                Card("heart ", card_value_string, card_value_int)
             )  # erstellt neue Karte in deck
-            self._cards.append(Card("Caro", card_value_string, card_value_int))
-            self._cards.append(Card("Pik", card_value_string, card_value_int))
-            self._cards.append(Card("Kreuz", card_value_string, card_value_int))
+            self._cards.append(Card("diamonds ", card_value_string, card_value_int))
+            self._cards.append(Card("spades", card_value_string, card_value_int))
+            self._cards.append(Card("cross", card_value_string, card_value_int))
 
     def __len__(self):
         return len(self._cards)

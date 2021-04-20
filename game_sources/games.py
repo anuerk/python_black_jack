@@ -2,21 +2,14 @@ from game_sources import Player, Deck, Card
 
 
 class Game:
-    def __init__(self, *, number_of_player, game="BlackJack"):
-        """Create a new game.
-
-        Args:
-            entries (sequence of players): players in the game
-            deck (instance of decks): the deck holding the gamecards
-        """
-
-        self._cards = number_of_player
+    def __init__(self, *, game="BlackJack"):
+        """Create a new game.  """
         if game == "BlackJack":  # maybe more will come
-            self.black_jack(number_of_player)
+            self.black_jack()
 
     @classmethod
-    def black_jack(cls, number_of_player):
-        """starts a black jack game
+    def black_jack(cls, ):
+        """logic for a black jack game
         todo!
         """
         player_count = int(input("How many (human) players?"))  # todo input validation
@@ -39,7 +32,7 @@ class Game:
         for current_player in players:
             new_card = game_cards.take_top_card_from_deck()
             current_player.take_card(new_card)
-            print(current_player.get_name, "has picked", new_card)
+            print(current_player.get_name, "has picked \033[1m", new_card.display_card, "\033[0m")
 
         hole_card = game_cards.take_top_card_from_deck()
         players[0].take_card(hole_card)
@@ -53,7 +46,7 @@ class Game:
                     print(
                         current_player.get_name,
                         "'s turn. Current cards: ",
-                        current_player.cards,
+                        current_player.display_hand_cards(),
                         sep="",
                     )  # todo: hide current cards for unauthorized user and display "nice" values
                     player_decision = input(
@@ -65,7 +58,7 @@ class Game:
                     elif player_decision == "yes" or player_decision == "y":
                         new_card = game_cards.take_top_card_from_deck()
                         current_player.take_card(new_card)
-                        print("you have picked", new_card)  # todo visualisation of card
+                        print("you have picked \033[1m", new_card.display_card, "\033[0m")  # todo visualisation of card
                     if current_player.get_score > 21:  # already lost?
                         current_player.set_player_mode(False)
 
@@ -74,7 +67,20 @@ class Game:
                 game_active = False
 
         # print game_end (highscore table - todo)
-        print("hole card is", hole_card)
+        print("hole card is \033[1m", hole_card.display_card, "\033[0m")
+        
+        while players[0].get_score < 17:
+            new_card = game_cards.take_top_card_from_deck()
+            players[0].take_card(new_card)
+            print("dealer picked new card \033[1m", new_card.display_card, "\033[0m")
+        
+            if players[0].get_score > 21:  # todo wenn dealer score dann wieder unter 17, dann wieder ziehen?
+                for dealer_card in  players[0].cards:  # todo list comprehensino
+                    if dealer_card.get_card_string == "Ace":
+                        players[0].update_player_score(-10)
+        
+        # print final result
+        print("dealer finale score:", players[0].get_score)
         winner = cls.get_winning_player(cls)
         print("And the winner is", winner[0], " -", winner[1])
 
