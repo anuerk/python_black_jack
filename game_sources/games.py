@@ -1,0 +1,107 @@
+from game_sources import Player, Deck, Card
+
+
+class Game:
+    def __init__(self, *, number_of_player, game="BlackJack"):
+        """Create a new game.
+
+        Args:
+            entries (sequence of players): players in the game
+            deck (instance of decks): the deck holding the gamecards
+        """
+
+        self._cards = number_of_player
+        if game == "BlackJack":  # maybe more will come
+            self.black_jack(number_of_player)
+
+    @classmethod
+    def black_jack(cls, number_of_player):
+        """starts a black jack game
+        todo!
+        """
+        player_count = int(input("How many (human) players?"))  # todo input validation
+
+        # initialise players
+        players = []
+        players.append(Player("Dealer", dealer=True))
+
+        for _ in range(0, player_count):
+            players.append(Player(input("Please insert player name")))
+
+        # create card deck and mix
+        game_cards = Deck(card_count_total=52)
+        game_cards.mix_deck()
+
+        cls._players = players
+        cls._cards = game_cards
+
+        # first card for all players - public
+        for current_player in players:
+            new_card = game_cards.take_top_card_from_deck()
+            current_player.take_card(new_card)
+            print(current_player.get_name, "has picked", new_card)
+
+        hole_card = game_cards.take_top_card_from_deck()
+        players[0].take_card(hole_card)
+
+        game_active = True
+        while game_active:
+            for current_player in players:
+                if (
+                    current_player.is_active and current_player.is_dealer == False
+                ):  # human player logic
+                    print(
+                        current_player.get_name,
+                        "'s turn. Current cards: ",
+                        current_player.cards,
+                        sep="",
+                    )  # todo: hide current cards for unauthorized user and display "nice" values
+                    player_decision = input(
+                        "new card? (yes or now)"
+                    ).lower()  # todo: maybe cursiv text in brackets
+                    # currently only Stand or hit - todo spilt double Insurance
+                    if player_decision == "no" or player_decision == "n":
+                        current_player.set_player_mode(False)
+                    elif player_decision == "yes" or player_decision == "y":
+                        new_card = game_cards.take_top_card_from_deck()
+                        current_player.take_card(new_card)
+                        print("you have picked", new_card)  # todo visualisation of card
+                    if current_player.get_score > 21:  # already lost?
+                        current_player.set_player_mode(False)
+
+            # do we need a new round?
+            if cls.all_human_players_finished(cls):
+                game_active = False
+
+        # print game_end (highscore table - todo)
+        print("hole card is", hole_card)
+        winner = cls.get_winning_player(cls)
+        print("And the winner is", winner[0], " -", winner[1])
+
+    @property
+    def get_player(self):
+        """"""
+        return self._players
+
+    def get_winning_player(self):
+        game_result = []
+        current_winner = "Dealer"
+        current_winner_score = 0
+
+        for _ in self._players:
+            player_score = _.get_score
+            if player_score < 22:  # nicht mehr gewinn relevant
+                if player_score >= current_winner_score:
+                    current_winner = (_.get_name, player_score)
+
+                current_winner_score = player_score
+
+        return current_winner
+
+    def all_human_players_finished(self):
+        """"""
+        for _ in self._players:
+            if _.is_active and _.is_dealer == False:
+                return False
+
+        return True
