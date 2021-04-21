@@ -12,16 +12,18 @@ class Game:
         """logic for a black jack game
         todo!
         """
-        player_count = int(input("How many (human) players?"))  # todo input validation
+        print("")
+        player_count = int(input("How many people want to play? "))  # todo input validation
 
         # initialise players
         players = []
         players.append(Player("Dealer", dealer=True))
 
         for _ in range(0, player_count):
-            players.append(Player(input("Please insert player name")))
+            players.append(Player(input("Please insert player name: ")))
 
         # create card deck and mix
+        print("")
         game_cards = Deck(card_count_total=52)
         game_cards.mix_deck()
 
@@ -32,11 +34,12 @@ class Game:
         for current_player in players:
             new_card = game_cards.take_top_card_from_deck()
             current_player.take_card(new_card)
-            print(current_player.get_name, "has picked \033[1m", new_card.display_card, "\033[0m")
+            print(current_player.get_name, "has picked the HOLE CARD and", new_card.display_card)
 
         hole_card = game_cards.take_top_card_from_deck()
         players[0].take_card(hole_card)
 
+        print("")
         game_active = True
         while game_active:
             for current_player in players:
@@ -45,12 +48,12 @@ class Game:
                 ):  # human player logic
                     print(
                         current_player.get_name,
-                        "'s turn. Current cards: ",
+                        " it is your turn. Current cards: ",
                         current_player.display_hand_cards(),
                         sep="",
                     )  # todo: hide current cards for unauthorized user and display "nice" values
                     player_decision = input(
-                        "new card? (yes or now)"
+                        "Do you want a new card? (yes or no) "
                     ).lower()  # todo: maybe cursiv text in brackets
                     # currently only Stand or hit - todo spilt double Insurance
                     if player_decision == "no" or player_decision == "n":
@@ -58,7 +61,9 @@ class Game:
                     elif player_decision == "yes" or player_decision == "y":
                         new_card = game_cards.take_top_card_from_deck()
                         current_player.take_card(new_card)
-                        print("you have picked \033[1m", new_card.display_card, "\033[0m")  # todo visualisation of card
+                        print("")
+                        print("you have picked", new_card.display_card)  # todo visualisation of card
+                        print("")
                     if current_player.get_score > 21:  # already lost?
                         current_player.set_player_mode(False)
 
@@ -67,12 +72,13 @@ class Game:
                 game_active = False
 
         # print game_end (highscore table - todo)
-        print("hole card is \033[1m", hole_card.display_card, "\033[0m")
+        print("")
+        print("hole card is", hole_card.display_card)
         
         while players[0].get_score < 17:
             new_card = game_cards.take_top_card_from_deck()
             players[0].take_card(new_card)
-            print("dealer picked new card \033[1m", new_card.display_card, "\033[0m")
+            print("dealer picked new card", new_card.display_card)
         
             if players[0].get_score > 21:  # todo wenn dealer score dann wieder unter 17, dann wieder ziehen?
                 for dealer_card in  players[0].cards:  # todo list comprehensino
@@ -82,7 +88,7 @@ class Game:
         # print final result
         print("dealer finale score:", players[0].get_score)
         winner = cls.get_winning_player(cls)
-        print("And the winner is", winner[0], " -", winner[1])
+        print("And the winner is", winner[0], " ", winner[1])
 
     @property
     def get_player(self):
