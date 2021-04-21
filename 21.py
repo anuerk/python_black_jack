@@ -3,23 +3,27 @@
 
 from game_sources import Game
 
-rules = "\nBlack jack Rules:\nHave fun!"
-user_input = input("\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) ")
+game = True
+while game:
+    rules = "\nBlack jack Rules:\nHave fun!"
+    user_input = input("\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) ")
 
-if user_input == "yes":
-	print(rules)
+    if user_input == "yes" or user_input == "y":
+        print(rules)
 
-while user_input == "":
-	user_input = input("You did not enter enything. How is your answer? ")
-	if user_input == "yes":
-		print(rules)
+    while user_input == "":
+        user_input = input("You did not enter enything. How is your answer? ")
+        if user_input == "yes":
+            print(rules)
 
-black_jack = Game(game="BlackJack")
+    black_jack = Game(game="BlackJack")
 
-input("Game over")
+    y_or_n = input("Game over - new round? (yes or no)")
+    if y_or_n == "no" or y_or_n == "n":
+        game = False
+
 # Todo: 
 
-#Player bekommt 2 Karten am Anfang 
 #Ansage, wenn der Spieler drüber ist: "Du bist raus!"
 #Ass problem
 #Geld Eisatz

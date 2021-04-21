@@ -36,10 +36,17 @@ class Game:
             current_player.take_card(new_card)
             print(current_player.get_name, "has picked the HOLE CARD and", new_card.display_card)
 
-        hole_card = game_cards.take_top_card_from_deck()
-        players[0].take_card(hole_card)
+        #hole_card = game_cards.take_top_card_from_deck()
+        #players[0].take_card(hole_card)
+        
+        # second card for all players - public
+        for current_player in players:
+            new_card = game_cards.take_top_card_from_deck()
+            current_player.take_card(new_card)
+            print(current_player.get_name, "has picked the HOLE CARD and", new_card.display_card)
 
         print("")
+        
         game_active = True
         while game_active:
             for current_player in players:
@@ -66,23 +73,30 @@ class Game:
                         print("")
                     if current_player.get_score > 21:  # already lost?
                         current_player.set_player_mode(False)
-
+                        
+                        for current_player_card in  current_player.cards:  # todo list comprehensino
+                            if current_player_card.get_card_string == "ACE":                               
+                                current_player.update_player_score(-10)
+                        
+                        if current_player.get_score > 21:
+                            print("over 21 - BUST ")
+                            
             # do we need a new round?
             if cls.all_human_players_finished(cls):
                 game_active = False
 
         # print game_end (highscore table - todo)
         print("")
-        print("hole card is", hole_card.display_card)
+        #print("hole card is", hole_card.display_card)
         
         while players[0].get_score < 17:
             new_card = game_cards.take_top_card_from_deck()
             players[0].take_card(new_card)
             print("dealer picked new card", new_card.display_card)
         
-            if players[0].get_score > 21:  # todo wenn dealer score dann wieder unter 17, dann wieder ziehen?
+            if players[0].get_score > 21: 
                 for dealer_card in  players[0].cards:  # todo list comprehensino
-                    if dealer_card.get_card_string == "Ace":
+                    if dealer_card.get_card_string == "ACE":  # todo - 2 mal mehr oder weniger gleiche abfrage
                         players[0].update_player_score(-10)
         
         # print final result
