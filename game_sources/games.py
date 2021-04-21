@@ -13,14 +13,33 @@ class Game:
         todo!
         """
         print("")
-        player_count = int(input("How many people want to play? "))  # todo input validation
-
+        
+        incorrect_human_input = True
+        while incorrect_human_input:
+            try:
+                player_count = int(input("How many people want to play? "))
+                if player_count < 1 or  player_count > 7:
+                    print("Please insert a number (1 - 7)")
+                else:
+                    incorrect_human_input = False    
+            except ValueError:
+                print("Please insert a number (1 - 7)")
+                
+                
+        
         # initialise players
         players = []
         players.append(Player("Dealer", dealer=True))
 
         for _ in range(0, player_count):
-            players.append(Player(input("Please insert player name: ")))
+            incorrect_human_input = True
+            while incorrect_human_input:
+                player_name = input("Please insert player name: ")
+                if player_name == "" or player_name == "Dealer":
+                    print("Name is not allowd")
+                else:
+                    players.append(Player(player_name))
+                    incorrect_human_input = False    
 
         # create card deck and mix
         print("")
@@ -126,8 +145,8 @@ class Game:
         #else:
         #    print("dealer finale score:", players[0].get_score)
         cls.print_result_table(final_result)    
-        winner = cls.get_winning_player()
-        print("todo win lose push And the winner is", winner[0], " ", winner[1])
+        #winner = cls.get_winning_player()
+        #print("todo win lose push And the winner is", winner[0], " ", winner[1])
 
     @property
     def get_player(self):
@@ -145,6 +164,7 @@ class Game:
 
         dealer_is_busted = False
         dealer_score = players_and_score[0]["score"]
+        push_result = False
         if players_and_score[0]["add_txt"] == "BUST":
             dealer_is_busted = True
         
@@ -152,23 +172,25 @@ class Game:
             formatted_name = "{:<19}".format(item["name"])
             formatted_txt = "{:<12}".format(item["add_txt"])
             if item["score"] > 21:
-                print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
-            elif item["score"] < 21 and dealer_is_busted:
-                print("|  WIN    |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                print("|  LOSE y |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+            elif item["score"] <= 21 and dealer_is_busted:
+                print("|  WIN 1  |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
             elif item["score"] == dealer_score and item["name"] != "Dealer":
+                push_result = True
                 print("|  PUSH   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|") 
             else:
                 #Sonst gewinnen nur jene Spieler, deren Kartenwerte näher an 21 Punkte heranreichen als der des Dealers. aber blackjack ist z.b. 21 aus 10, 10, ass todo
                 if (21 - dealer_score) > (21 - item["score"]): 
-                    print("|  WIN    |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                    print("|  WIN 2  |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
                 else:
-                    print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                    print("|  LOSE x |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
         
         print("|--------------------------------------------------------|")
 
         
     @classmethod
     def get_winning_player(cls):
+        """i think this one is not needed"""
         game_result = []
         current_winner = "Dealer"
         current_winner_score = 0
