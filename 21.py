@@ -9,7 +9,7 @@ while game:
     user_input = input("\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) ")
 
     if user_input == "yes" or user_input == "y":
-        print(rules)
+        print(rules)  # todo
 
     while user_input == "":
         user_input = input("You did not enter enything. How is your answer? ")
@@ -24,8 +24,6 @@ while game:
 
 # Todo: 
 
-#Ansage, wenn der Spieler drüber ist: "Du bist raus!"
-#Ass problem
 #Geld Eisatz
 
 
@@ -39,7 +37,23 @@ while game:
 # user names not euql
 # prüfen von karten deck (semantisch ;)
 # intitial - regel anzeigen? ja oder nein 
-#zu 52 Blatt, also 312 Karten gespielt 
-# mehr als 21 bust
 # black jack ist entweder Ass + 10
 
+# todo: 
+# einsatz einbauen + gewinn verteilung
+# bis zu sieben Spieler + input validation für user anzahl (nur int)
+# 6 decks - 52 Blatt, also 312 Karten gespielt 
+
+# final score ermitteln:
+
+# print_final_score()
+## black jack ist entweder Ass + 10 oder 7 + 7 + 7
+## black jack ist besser als normale 21
+## mehr als 21 bust
+## untentschieden - dealer gewinnt
+
+# nice to have
+## todo repr umbau, dass instanzierung möglich ist
+## cheat_modus - kartenzählen 
+## docstring
+## weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln

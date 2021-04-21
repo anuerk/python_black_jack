@@ -8,3 +8,7 @@ game_sources/__pycache__/__init__.cpython-39.pyc
 game_sources/.ipynb_checkpoints/games-checkpoint.py
 .ipynb_checkpoints/21-checkpoint.py
 game_sources/.ipynb_checkpoints/decks-checkpoint.py
+*.pyc
+*.pyc
+*.ipynb
+*.pyc
