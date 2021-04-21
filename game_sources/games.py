@@ -36,9 +36,6 @@ class Game:
             current_player.take_card(new_card)
             print(current_player.get_name, "has picked the HOLE CARD and", new_card.display_card)
 
-        #hole_card = game_cards.take_top_card_from_deck()
-        #players[0].take_card(hole_card)
-        
         # second card for all players - public
         for current_player in players:
             new_card = game_cards.take_top_card_from_deck()
@@ -75,7 +72,7 @@ class Game:
                         current_player.set_player_mode(False)
                         
                         for current_player_card in current_player.cards:  # todo list comprehensino
-                            if current_player_card.get_card_string == "ACE":                               
+                            if current_player_card.get_card_string == "ACE":  # todo problem. zieht es halt immer mehrmals ab :()                           
                                 current_player.update_player_score(-10)
                                 print("debug: ace reduction for player :) new score:", current_player.get_score)
                         
@@ -85,13 +82,11 @@ class Game:
                             current_player.set_player_mode(True)
                             
             # do we need a new round?
-            if cls.all_human_players_finished(cls):
+            if cls.all_human_players_finished():
                 game_active = False
 
-        # print game_end (highscore table - todo)
         print("")
-        #print("hole card is", hole_card.display_card)
-        
+        #dealer must have at least a score of 17        
         while players[0].get_score < 17:
             new_card = game_cards.take_top_card_from_deck()
             players[0].take_card(new_card)
@@ -130,21 +125,55 @@ class Game:
         #    print("dealer BUST")
         #else:
         #    print("dealer finale score:", players[0].get_score)
-            
-        winner = cls.get_winning_player(cls)
+        cls.print_result_table(final_result)    
+        winner = cls.get_winning_player()
         print("todo win lose push And the winner is", winner[0], " ", winner[1])
 
     @property
     def get_player(self):
         """"""
         return self._players
+    
+    @classmethod
+    def print_result_table(cls, players_and_score):
+        """"""
+        list_ordered_by_score = sorted(players_and_score, key=lambda k: k['score'], reverse=True)
+        print("|--------------------------------------------------------|")
+        print("|        ROUND FINISHED                                  |")
+        print("|                                                        |")
+        print("| Result  | Score | Name                 | Info          |")
 
-    def get_winning_player(self):
+        dealer_is_busted = False
+        dealer_score = players_and_score[0]["score"]
+        if players_and_score[0]["add_txt"] == "BUST":
+            dealer_is_busted = True
+        
+        for item in list_ordered_by_score:
+            formatted_name = "{:<19}".format(item["name"])
+            formatted_txt = "{:<12}".format(item["add_txt"])
+            if item["score"] > 21:
+                print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+            elif item["score"] < 21 and dealer_is_busted:
+                print("|  WIN    |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+            elif item["score"] == dealer_score and item["name"] != "Dealer":
+                print("|  PUSH   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|") 
+            else:
+                #Sonst gewinnen nur jene Spieler, deren Kartenwerte näher an 21 Punkte heranreichen als der des Dealers. aber blackjack ist z.b. 21 aus 10, 10, ass todo
+                if (21 - dealer_score) > (21 - item["score"]): 
+                    print("|  WIN    |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                else:
+                    print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+        
+        print("|--------------------------------------------------------|")
+
+        
+    @classmethod
+    def get_winning_player(cls):
         game_result = []
         current_winner = "Dealer"
         current_winner_score = 0
 
-        for _ in self._players:
+        for _ in cls._players:
             player_score = _.get_score
             if player_score < 22:  # nicht mehr gewinn relevant
                 if player_score >= current_winner_score:
@@ -153,10 +182,11 @@ class Game:
                 current_winner_score = player_score
 
         return current_winner
-
-    def all_human_players_finished(self):
+    
+    @classmethod
+    def all_human_players_finished(cls):
         """"""
-        for _ in self._players:
+        for _ in cls._players:
             if _.is_active and _.is_dealer == False:
                 return False
 
