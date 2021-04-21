@@ -86,20 +86,20 @@ class Game:
                         current_player.take_card(new_card)
                         print("")
                         print("you have picked", new_card.display_card)  # todo visualisation of card
-                        print("")
                     if current_player.get_score > 21:  # already lost?
                         current_player.set_player_mode(False)
                         
                         for current_player_card in current_player.cards:  # todo list comprehensino
-                            if current_player_card.get_card_string == "ACE":  # todo problem. zieht es halt immer mehrmals ab :()                           
+                            if current_player_card.get_card_string == "ACE":  # todo problem. zieht es halt immer mehrmals ab :()                       
                                 current_player.update_player_score(-10)
-                                print("debug: ace reduction for player :) new score:", current_player.get_score)
+                                current_player.fake_ace_string(current_player_card)
                         
                         if current_player.get_score > 21:
-                            print("over 21 - BUST ")
+                            print("BUST - over 21")
                         else:
                             current_player.set_player_mode(True)
                             
+                    print("")
             # do we need a new round?
             if cls.all_human_players_finished():
                 game_active = False
@@ -156,7 +156,7 @@ class Game:
     @classmethod
     def print_result_table(cls, players_and_score):
         """"""
-        list_ordered_by_score = sorted(players_and_score, key=lambda k: k['score'], reverse=True)
+        
         print("|--------------------------------------------------------|")
         print("|        ROUND FINISHED                                  |")
         print("|                                                        |")
@@ -164,30 +164,65 @@ class Game:
 
         dealer_is_busted = False
         dealer_score = players_and_score[0]["score"]
-        push_result = False
-        if players_and_score[0]["add_txt"] == "BUST":
+        dealer_txt = players_and_score[0]["add_txt"]
+        if dealer_txt == "BUST":
             dealer_is_busted = True
+        elif dealer_txt == "BLACKJACK":
+            print("|  WINS   |  ", players_and_score[0]["score"], " | Dealer     |  BLACKJACK  |")
+        # dealer gets special treatment
+        del players_and_score[0]
+        list_ordered_by_score = sorted(players_and_score, key=lambda k: k['score'], reverse=True)
+        
+        winner_found = False
+        current_winner_score = 0
+        winner_count = 0  # bad, but it will help
+        push = False
         
         for item in list_ordered_by_score:
             formatted_name = "{:<19}".format(item["name"])
             formatted_txt = "{:<12}".format(item["add_txt"])
+            if current_winner_score == item["score"]:
+                print("we have a push! or?")
             if item["score"] > 21:
-                print("|  LOSE y |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
-            elif item["score"] <= 21 and dealer_is_busted:
+                print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+            elif item["score"] <= 21 and dealer_is_busted and current_winner_score != item["score"]:
                 print("|  WIN 1  |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
-            elif item["score"] == dealer_score and item["name"] != "Dealer":
-                push_result = True
+                winner_found = True
+                winner_count += 1
+                current_winner_score = item["score"]
+            elif item["score"] == dealer_score:
                 print("|  PUSH   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|") 
+                push = True
+            elif item["add_txt"] == "BLACKJACK":
+                print("|  WIN    |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|") 
+                winner_found = True
+                winner_count += 1
+                current_winner_score = item["score"]
             else:
                 #Sonst gewinnen nur jene Spieler, deren Kartenwerte näher an 21 Punkte heranreichen als der des Dealers. aber blackjack ist z.b. 21 aus 10, 10, ass todo
-                if (21 - dealer_score) > (21 - item["score"]): 
+                if ((21 - dealer_score) > (21 - item["score"])) and ((21 - current_winner_score) > (21 - item["score"]))  and current_winner_score != item["score"]: 
+                    current_winner_score = item["score"]
                     print("|  WIN 2  |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                    winner_found = True
+                    winner_count += 1
+                    current_winner_score = item["score"]
                 else:
-                    print("|  LOSE x |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                    print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
         
-        print("|--------------------------------------------------------|")
+        
 
-        
+        if winner_found == False and dealer_is_busted != True and push == False:
+            print("|  WINS   |  ", dealer_score, " |  Dealer              |               |")
+        elif push == True:
+            print("|  PUSH   |  ", dealer_score, " |  Dealer              |               |")
+            winner_count += 1
+        else:
+            print("|  LOSE   |  ", dealer_score, " |  Dealer              |               |")
+            
+        print("|--------------------------------------------------------|")
+        if (winner_count > 1):
+            print("Ooops! to many winners :/ something went wrong in games->print_result_table")
+    
     @classmethod
     def get_winning_player(cls):
         """i think this one is not needed"""
