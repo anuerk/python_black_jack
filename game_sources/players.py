@@ -48,17 +48,16 @@ class Player:
     def update_player_score(self, update_value):
         """"""
         self._score += update_value
-        
+
     def display_hand_cards(self):
         """todo"""
         card_list = []
         for card in self._cards:
             card_list.append(card.display_card)
         return list(card_list)
-    
+
     def fake_ace_string(self, a_ace_card):
-        """ updates the string from ace that it is interpreted with the value of 1
-        """
+        """updates the string from ace that it is interpreted with the value of 1"""
 
         for card in self._cards:
             if card._card_number_string == "ACE":

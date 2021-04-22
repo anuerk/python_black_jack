@@ -1,7 +1,5 @@
 from game_sources.cards import Card
-from game_sources.players import Player
 from random import shuffle
-import random
 
 
 class Deck:
@@ -16,8 +14,7 @@ class Deck:
         self._card_count_total = card_count_total
 
         cards_needed = int((card_count_total / 4) + 2)
-        
-        
+
         """    todo
 # define the card ranks, and suits
 ranks = [_ for _ in range(2, 11)] + ['JACK', 'QUEEN', 'KING', 'ACE']
@@ -68,20 +65,5 @@ def get_deck():
     def mix_deck(self):
         shuffle(self._cards)
 
-    def take_top_card_from_deck(self):  
+    def take_top_card_from_deck(self):
         return self._cards.pop()
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

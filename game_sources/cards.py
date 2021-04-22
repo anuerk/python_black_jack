@@ -31,7 +31,7 @@ class Card:
     def get_card_string(self):
         """"""
         return self._card_number_string
-    
+
     @property
     def display_card(self):
         """"""
@@ -42,7 +42,6 @@ class Card:
         self.card_value_int = value
 
     def ace_one_value(self):  # currently not used
-        """updates the value of ace - 11 to ace - 1
-        """
+        """updates the value of ace - 11 to ace - 1"""
         self._card_value_int = 1
         self._card_number_string = "ACE_1"

@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#Benutzung von Umlauten
+# Benutzung von Umlauten
 
 from game_sources import Game
 
 game = True
-intial_game = True
+initial_game = True
 
 while game:
-    if intial_game:
+    if initial_game:
         rules = "\nBlack jack Rules:\nHave fun!"
-        user_input = input("\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) ")
+        user_input = input(
+            "\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) "
+        )
 
         if user_input == "yes" or user_input == "y":
             print(rules)  # todo
-            
+
         while user_input == "":
             user_input = input("You did not enter enything. How is your answer? ")
             if user_input == "yes":
@@ -22,18 +24,18 @@ while game:
     # general game loop
     black_jack = Game(game="BlackJack")
 
-    y_or_n = input("Game over - new round? (yes or no)")  # todo - same settings as bevore? so no need to enter 
+    y_or_n = input(
+        "Game over - new round? (yes or no)"
+    )  # todo - same settings as before? so no need to enter
     if y_or_n == "no" or y_or_n == "n":
         game = False
     else:
-        intial_game = False
-        
-
-# Todo: 
-
-#Geld Eisatz
+        initial_game = False
 
 
+# Todo:
+
+# Geld Eisatz
 # untentschieden - dealer gewinnt
 # dealer zählt anders
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
@@ -43,13 +45,13 @@ while game:
 # card aufbau (tuple) string int, etc
 # user names not euql
 # prüfen von karten deck (semantisch ;)
-# intitial - regel anzeigen? ja oder nein 
+# intitial - regel anzeigen? ja oder nein
 # black jack ist entweder Ass + 10
 
-# todo: 
+# todo:
 # einsatz einbauen + gewinn verteilung
 # bis zu sieben Spieler + input validation für user anzahl (nur int)
-# 6 decks - 52 Blatt, also 312 Karten gespielt 
+# 6 decks - 52 Blatt, also 312 Karten gespielt
 
 # final score ermitteln:
 
@@ -60,7 +62,6 @@ while game:
 ## untentschieden - dealer gewinnt
 
 # nice to have
-## todo repr umbau, dass instanzierung möglich ist
-## cheat_modus - kartenzählen 
+## cheat_modus - kartenzählen
 ## docstring
 ## weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln
