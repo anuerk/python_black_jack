@@ -135,18 +135,7 @@ class Game:
             }
             final_result.append(player_result)
 
-            
-        #for key in sorted(final_result):
-        #    print (key, final_result[key])
-            
-        #print(final_result)
-        #if players[0].get_score > 21 :
-        #    print("dealer BUST")
-        #else:
-        #    print("dealer finale score:", players[0].get_score)
         cls.print_result_table(final_result)    
-        #winner = cls.get_winning_player()
-        #print("todo win lose push And the winner is", winner[0], " ", winner[1])
 
     @property
     def get_player(self):
@@ -157,71 +146,101 @@ class Game:
     def print_result_table(cls, players_and_score):
         """"""
         
-        print("|--------------------------------------------------------|")
         print("|        ROUND FINISHED                                  |")
-        print("|                                                        |")
-        print("| Result  | Score | Name                 | Info          |")
 
         dealer_is_busted = False
+        dealer_has_blackjack = False
         dealer_score = players_and_score[0]["score"]
         dealer_txt = players_and_score[0]["add_txt"]
         if dealer_txt == "BUST":
             dealer_is_busted = True
         elif dealer_txt == "BLACKJACK":
-            print("|  WINS   |  ", players_and_score[0]["score"], " | Dealer     |  BLACKJACK  |")
+            dealer_has_blackjack = True
         # dealer gets special treatment
-        del players_and_score[0]
+        #del players_and_score[0]
         list_ordered_by_score = sorted(players_and_score, key=lambda k: k['score'], reverse=True)
         
         winner_found = False
         current_winner_score = 0
         winner_count = 0  # bad, but it will help
+        loser_count = 0  # bad, but it will help
         push = False
         
-        for item in list_ordered_by_score:
-            formatted_name = "{:<19}".format(item["name"])
-            formatted_txt = "{:<12}".format(item["add_txt"])
-            if current_winner_score == item["score"]:
-                print("we have a push! or?")
-            if item["score"] > 21:
-                print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
-            elif item["score"] <= 21 and dealer_is_busted and current_winner_score != item["score"]:
-                print("|  WIN 1  |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
-                winner_found = True
-                winner_count += 1
-                current_winner_score = item["score"]
-            elif item["score"] == dealer_score:
-                print("|  PUSH   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|") 
-                push = True
-            elif item["add_txt"] == "BLACKJACK":
-                print("|  WIN    |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|") 
-                winner_found = True
-                winner_count += 1
-                current_winner_score = item["score"]
-            else:
-                #Sonst gewinnen nur jene Spieler, deren Kartenwerte näher an 21 Punkte heranreichen als der des Dealers. aber blackjack ist z.b. 21 aus 10, 10, ass todo
-                if ((21 - dealer_score) > (21 - item["score"])) and ((21 - current_winner_score) > (21 - item["score"]))  and current_winner_score != item["score"]: 
-                    current_winner_score = item["score"]
-                    print("|  WIN 2  |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
-                    winner_found = True
+        #dealer_wins
+        
+        result_list = []
+        score_list = []
+        name_list = []
+        player_result = []
+        
+        if dealer_is_busted:  # Sollte der Dealer mit seinem Blatt 21 Punkte überschreiten, haben alle Teilnehmer, die nicht schon ausgeschieden sind, automatisch gewonnen, laut Blackjack Spielregeln. 
+            for item in list_ordered_by_score:
+                if item["score"] < 22:
+                    score_list.append(item["score"])
+                    name_list.append(item["name"])
+                    player_result.append("WINS")
                     winner_count += 1
-                    current_winner_score = item["score"]
                 else:
-                    print("|  LOSE   |  ", item["score"], " | ", formatted_name , "| ", formatted_txt, "|")
+                    score_list.append(item["score"])
+                    name_list.append(item["name"])
+                    player_result.append("LOSE")  
+                    loser_count += 1
+    
+            for x, y, z in zip(score_list, name_list, player_result):
+                result_list.append({"score" :x, "name" :y, "result" :z})
         
-        
-
-        if winner_found == False and dealer_is_busted != True and push == False:
-            print("|  WINS   |  ", dealer_score, " |  Dealer              |               |")
-        elif push == True:
-            print("|  PUSH   |  ", dealer_score, " |  Dealer              |               |")
-            winner_count += 1
-        else:
-            print("|  LOSE   |  ", dealer_score, " |  Dealer              |               |")
+        elif dealer_has_blackjack:
+            for item in list_ordered_by_score:
+                score_list.append(item["score"])
+                name_list.append(item["name"])
+    
+            # do we have a push
+            for x, y in zip(score_list, name_list):
+                if x == 21 and y != "Dealer":
+                    result_list.append({"score" :x, "name" :y, "result" :"PUSH"})
+                    list_item = {x, y, "PUSH"}
+                    winner_count += 1
+                else:
+                    result_list.append({"score" :x, "name" :y, "result" :"LOSE"})
+                    loser_count += 1
+                    
+                result_list.append(list_item)
+        else:  # most probably case
+            for item in list_ordered_by_score:
+                score_list.append(item["score"])
+                name_list.append(item["name"])
             
-        print("|--------------------------------------------------------|")
-        if (winner_count > 1):
-            print("Ooops! to many winners :/ something went wrong in games->print_result_table")
+            score_list_filtered = [score for score in score_list if score <= 21]  # remove scores to high
+            nearest_score = min(score_list_filtered, key=lambda x:abs(x-21))  # stolen from https://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value   
+            nearest_hit_count = 0  # falls mehrere spieler gleiche anzahl punkte haben
+            
+            for score, name in zip(score_list, name_list):
+                if score > 21:
+                    list_item = {"score" : score, "name" : name, "result" : "LOSE"}
+                    loser_count += 1
+                else:                   
+                    if score == nearest_score:
+                        list_item = {"score" : score, "name" : name, "result" : "WINS"}
+                        winner_count += 1
+                        nearest_hit_count += 1
+                    else:
+                        list_item = {"score" : score, "name" : name, "result" : "LOSE"}
+                        loser_count += 1
+
+                result_list.append(list_item)
+                
+        print("nearest_score", nearest_score)
+        if winner_count == 0:
+            print("i think the dealer should have won")
+        elif  winner_count  > 1:  # happens when players have the same score
+            i = 0
+            for item in result_list:
+                if (item["score"] == dealer_score and item["result"] == "WINS"):  # #todo blackjack is better than 10 + 5 + 6we have a push
+                    result_list[i]["result"] = "PUSH"
+                i += 1
+                    
+        print(result_list)
+            
     
     @classmethod
     def get_winning_player(cls):

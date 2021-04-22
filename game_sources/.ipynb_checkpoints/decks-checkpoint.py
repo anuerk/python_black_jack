@@ -16,6 +16,16 @@ class Deck:
         self._card_count_total = card_count_total
 
         cards_needed = int((card_count_total / 4) + 2)
+        
+        
+        """    todo
+# define the card ranks, and suits
+ranks = [_ for _ in range(2, 11)] + ['JACK', 'QUEEN', 'KING', 'ACE']
+suits = ['SPADE', 'HEART ', 'DIAMOND', 'CLUB']
+
+def get_deck():
+    #Return a new deck of cards.
+    return [[rank, suit] for rank in ranks for suit in suits]"""
 
         for _ in range(2, cards_needed):
             if _ == 11:
@@ -56,12 +66,22 @@ class Deck:
             ) from None  # unterdrückt den e
 
     def mix_deck(self):
-        """"""
-        # self._cards = shuffle(self._cards)
         shuffle(self._cards)
 
-    def take_top_card_from_deck(self):  # todo nicht random sonder oberste
-        """"""
-        card_pick = self._cards[0]
-        self._cards.remove(card_pick)
-        return card_pick
+    def take_top_card_from_deck(self):  
+        return self._cards.pop()
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

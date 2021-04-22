@@ -12,3 +12,4 @@ game_sources/.ipynb_checkpoints/decks-checkpoint.py
 *.pyc
 *.ipynb
 *.pyc
+*.pyc
