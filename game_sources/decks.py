@@ -9,10 +9,10 @@ class Deck:
     """
 
     def __init__(self, *, card_count_total=52):
-        # todo : doc string + check für card count durch 4 teilbar
         self._cards = []
         self._card_count_total = card_count_total
 
+        #todo card_count_total
         cards_needed = int((card_count_total / 4) + 2)
 
         """    todo
@@ -28,12 +28,18 @@ def get_deck():
             if _ == 11:
                 card_value_string = "JACK"
                 card_value_int = 10
+                card_value_string = "ACE"
+                card_value_int = 11  # todo
             elif _ == 12:
                 card_value_string = "QUEEN"
                 card_value_int = 10
+                card_value_string = "ACE"
+                card_value_int = 11
             elif _ == 13:
                 card_value_string = "KING"
                 card_value_int = 10
+                card_value_string = "ACE"
+                card_value_int = 11
             elif _ == 14:
                 card_value_string = "ACE"
                 card_value_int = 11
@@ -41,11 +47,7 @@ def get_deck():
                 card_value_int = _
                 card_value_string = str(_)
 
-            # problem: bube dame könig -> 10 - ass 1 || 11
-
-            self._cards.append(
-                Card("HEART", card_value_string, card_value_int)
-            )  # erstellt neue Karte in deck
+            self._cards.append(Card("HEART", card_value_string, card_value_int))
             self._cards.append(Card("TILE", card_value_string, card_value_int))
             self._cards.append(Card("PIKE", card_value_string, card_value_int))
             self._cards.append(Card("CLOVER", card_value_string, card_value_int))
@@ -53,14 +55,14 @@ def get_deck():
     def __len__(self):
         return len(self._cards)
 
-    def __getitem__(self, index):  # => implementiert indexing
+    def __getitem__(self, index):
         try:
             return self._cards[index]
         except IndexError:
-            n_entries = len(self)  # dispatcht zur __len__ funktion
+            n_cards = len(self)
             raise IndexError(
-                f"the vector has only {n_entries} entries"
-            ) from None  # unterdrückt den e
+                f"the deck has only {n_cards} cards"
+            ) from None
 
     def mix_deck(self):
         shuffle(self._cards)

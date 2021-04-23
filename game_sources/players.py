@@ -21,7 +21,7 @@ class Player:
         self.update_player_score(card.get_card_value)
         self._cards.append(card)
 
-    @property  # erstellt ein read-only Attribu
+    @property
     def cards(self):
         return self._cards
 
@@ -50,15 +50,14 @@ class Player:
         self._score += update_value
 
     def display_hand_cards(self):
-        """todo"""
+        """returns the players cards current on his hand"""
         card_list = []
         for card in self._cards:
             card_list.append(card.display_card)
-        return list(card_list)
+        return card_list
 
     def fake_ace_string(self, a_ace_card):
         """updates the string from ace that it is interpreted with the value of 1"""
-
         for card in self._cards:
             if card._card_number_string == "ACE":
                 card.ace_one_value()

@@ -34,34 +34,12 @@ while game:
 
 
 # Todo:
-
 # Geld Eisatz
-# untentschieden - dealer gewinnt
 # dealer zählt anders
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
-# docstring
-# input validation
-# todo repr umbau, dass instanzierung möglich ist
-# card aufbau (tuple) string int, etc
-# user names not euql
-# prüfen von karten deck (semantisch ;)
+# repr umbau, dass instanzierung möglich ist  card aufbau (tuple) string int, etc
 # intitial - regel anzeigen? ja oder nein
-# black jack ist entweder Ass + 10
-
-# todo:
-# einsatz einbauen + gewinn verteilung
 # bis zu sieben Spieler + input validation für user anzahl (nur int)
 # 6 decks - 52 Blatt, also 312 Karten gespielt
-
-# final score ermitteln:
-
-# print_final_score()
-## black jack ist entweder Ass + 10 oder 7 + 7 + 7
-## black jack ist besser als normale 21
-## mehr als 21 bust
-## untentschieden - dealer gewinnt
-
-# nice to have
-## cheat_modus - kartenzählen
-## docstring
-## weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln
+# black jack ist entweder Ass + 10 oder 7 + 7 + 7 und ist besser als normale 21
+# weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln

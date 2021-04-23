@@ -4,17 +4,17 @@ class Card:
     """
 
     def __init__(self, card_type, card_number_string, card_number_int):
-        """create a new matrix object.
+        """create a new card deck object.
 
         Args:
             type: the type of the card (diamonds ace of spades cross)
-            number: the number of the card (7, 8, ...... king, ace)
-            todo
+            card_number_string: the number of the card (7, 8, ...... king, ace)
+            card_number_int: the integer value of the card
         """
         self._type = card_type
         # self._number = (card_number_int, card_number_string)
         self._card_number_int = card_number_int
-        self._card_number_string = card_number_string  # todo
+        self._card_number_string = card_number_string
 
     def __repr__(self):  # Addressat kann auch ein Log-File sein
         """Text representation"""
@@ -39,9 +39,12 @@ class Card:
 
     def update_value(self, value):  # currently not used
         """"""
-        self.card_value_int = value
+        self._card_number_int = value
+        return self
 
     def ace_one_value(self):  # currently not used
         """updates the value of ace - 11 to ace - 1"""
-        self._card_value_int = 1
+        self._card_number_int = 1
         self._card_number_string = "ACE_1"
+
+
