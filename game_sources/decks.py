@@ -12,7 +12,7 @@ class Deck:
         self._cards = []
         self._card_count_total = card_count_total
 
-        #todo card_count_total
+        # todo card_count_total
         cards_needed = int((card_count_total / 4) + 2)
 
         """    todo
@@ -28,18 +28,12 @@ def get_deck():
             if _ == 11:
                 card_value_string = "JACK"
                 card_value_int = 10
-                card_value_string = "ACE"
-                card_value_int = 11  # todo
             elif _ == 12:
                 card_value_string = "QUEEN"
                 card_value_int = 10
-                card_value_string = "ACE"
-                card_value_int = 11
             elif _ == 13:
                 card_value_string = "KING"
                 card_value_int = 10
-                card_value_string = "ACE"
-                card_value_int = 11
             elif _ == 14:
                 card_value_string = "ACE"
                 card_value_int = 11

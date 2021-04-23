@@ -4,17 +4,19 @@ from game_sources import Player, Deck
 class Game:
     def __init__(self, *, game="BlackJack"):
         """Create a new game.  """
+        self._cards = None
+        self._players = None
         if game == "BlackJack":  # maybe more will come
             self.black_jack()
 
-    @classmethod
-    def black_jack(cls):
+    def black_jack(self):
         """logic for a black jack game
         taken from https://www.bettingexpert.com/de/casino/blackjack/regeln
         """
         print("")
 
         incorrect_human_input = True
+        player_count = 0
         while incorrect_human_input:
             try:
                 player_count = int(input("How many people want to play? "))
@@ -43,8 +45,8 @@ class Game:
         game_cards = Deck(card_count_total=52)
         game_cards.mix_deck()
 
-        cls._players = players
-        cls._cards = game_cards
+        self._players = players
+        self._cards = game_cards
 
         # first card for all players - public
         for current_player in players:
@@ -79,6 +81,7 @@ class Game:
         game_active = True
         while game_active:
             for current_player in players:
+
                 if (
                     current_player.is_active and current_player.is_dealer is False
                 ):  # human-player
@@ -91,41 +94,14 @@ class Game:
                     player_decision = input(
                         "Do you want a new card? (yes or no) "
                     ).lower()
-                    # currently only Stand or hit - todo spilt double Insurance
+                    # currently only Stand or hit
                     if player_decision == "no" or player_decision == "n":
                         current_player.set_player_mode(False)
                     elif player_decision == "yes" or player_decision == "y":
                         new_card = game_cards.take_top_card_from_deck()
-                        ace_count = 0
-                        current_player_aces = []
 
                         # find optimal ace value for player
-                        for current_player_card in current_player.cards:
-                            if "ACE" in current_player_card.get_card_string:
-                                ace_count += 1
-                                current_player_aces.append(current_player_card)
-
-                        if new_card.get_card_value == 11:
-                            ace_count += 1
-
-                        if (
-                            ace_count > 0
-                            and current_player.get_score + new_card.get_card_value > 21
-                        ):
-                            # problem is the new ace?
-                            if new_card.get_card_value == 11:
-                                new_card.update_value(1)
-
-                            if current_player.get_score + new_card.get_card_value > 21:
-                                for card in current_player.cards:
-                                    if (
-                                        card.get_card_value == 11
-                                        and current_player.get_score
-                                        + new_card.get_card_value
-                                        > 21
-                                    ):  # there was already an ace on the players hand
-                                        card.update_value(1)
-                                        current_player.update_player_score(-10)
+                        self.check_ace_options(current_player, new_card)
 
                         current_player.take_card(new_card)
 
@@ -141,25 +117,21 @@ class Game:
                             current_player.set_player_mode(True)
 
                     print("")
-            # do we need a new round?
-            if cls.all_human_players_finished():
+
+            if self.all_human_players_finished(players):
                 game_active = False
 
         print("")
-        print("Dealer Hole card:", hole_card)
+        print("Dealer Hole card:", hole_card.display_card)
 
         # dealer must have at least a score of 17
         while players[0].get_score < 17:
             new_card = game_cards.take_top_card_from_deck()
             players[0].take_card(new_card)
-            print("dealer picked new card", new_card.display_card)
+            print("Dealer picked new card", new_card.display_card)
 
             if players[0].get_score > 21:
-                for dealer_card in players[0].cards:  # todo list comprehensino
-                    if (
-                        dealer_card.get_card_string == "ACE"
-                    ):  # todo - 2 mal mehr oder weniger gleiche abfrage
-                        players[0].update_player_score(-10)
+                self.check_ace_options(players[0], new_card)
 
         ##########################
         # calculate final result #
@@ -168,7 +140,7 @@ class Game:
         for player in players:
             if player.get_score > 21:
                 special_result = "BUST"
-            elif cls.is_blackjack(player._cards):
+            elif self.is_blackjack(player.cards):
                 special_result = "BLACKJACK"
             else:
                 special_result = ""
@@ -180,37 +152,13 @@ class Game:
             }
             final_result.append(player_result)
 
-        game_result = cls.calculate_round_winner(final_result)
-        cls.print_result(game_result)
+        game_result = self.calculate_round_winner(final_result)
+        self.print_result(game_result)
 
     @property
     def get_player(self):
         """"""
         return self._players
-
-    @classmethod
-    def print_result(cls, game_result):
-        """gets a list with players: score, name, result
-        and prints it
-        """
-        print("")
-        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
-        print("|                ROUND OVER                                  |")
-        print("|____________________________________________________________|")
-        print("| Name                          |       Result   |   Score   |")
-        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
-        for player in game_result:
-            print(
-                "|  ",
-                "{0: <27}".format(player["name"]),
-                "|   ",
-                "{0: <11}".format(player["score"]),
-                "|    ",
-                "{0: <5}".format(player["result"]),
-                "|",
-            )
-        print("|____________________________________________________________|")
-        print("")
 
     @classmethod
     def calculate_round_winner(cls, players_and_score):
@@ -250,10 +198,10 @@ class Game:
 
         if dealer_is_busted:
             for item in list_ordered_by_score:
-                if item["score"] == nearest_score:
+                if item["score"] <= 21 and item["name"] != "Dealer":
                     score_list.append(item["score"])
                     name_list.append(item["name"])
-                    player_result.append("WINS")
+                    player_result.append("WINS")  # todo do we need wins?
                     winner_count += 1
                 else:
                     score_list.append(item["score"])
@@ -316,9 +264,8 @@ class Game:
         return result_list
 
     @classmethod
-    def all_human_players_finished(cls):
-        """"""
-        for _ in cls._players:
+    def all_human_players_finished(cls, human_player_list):
+        for _ in human_player_list:
             if _.is_active and _.is_dealer is False:
                 return False
 
@@ -340,3 +287,59 @@ class Game:
                 return True
 
         return False
+
+    @classmethod
+    def print_result(cls, game_result):  # ide hint should be static? todo
+        """gets a list with players: score, name, result
+        and prints it
+        """
+        print("")
+        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
+        print("|                ROUND OVER                                  |")
+        print("|____________________________________________________________|")
+        print("|    Name                       |       Result   |   Score   |")
+        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
+        for player in game_result:
+            print(
+                "|  ",
+                "{0: <27}".format(player["name"]),
+                "|   ",
+                "{0: <11}".format(player["score"]),
+                "|    ",
+                "{0: <5}".format(player["result"]),
+                "|",
+            )
+        print("|____________________________________________________________|")
+        print("")
+
+    @classmethod
+    def check_ace_options(cls, xy_player, new_card):
+        """checks player cards for possibility to reduce score"""
+
+        new_card = new_card
+        current_player = xy_player
+        ace_count = 0
+        current_player_aces = []
+
+        # find optimal ace value for player
+        for current_player_card in current_player.cards:
+            if "ACE" in current_player_card.get_card_string:
+                ace_count += 1
+                current_player_aces.append(current_player_card)
+
+        if new_card.get_card_value == 11:
+            ace_count += 1
+
+        if ace_count > 0 and current_player.get_score + new_card.get_card_value > 21:
+            # problem is the new ace?
+            if new_card.get_card_value == 11:
+                new_card.update_value(1)
+
+            if current_player.get_score + new_card.get_card_value > 21:
+                for card in current_player.cards:
+                    if (
+                        card.get_card_value == 11
+                        and current_player.get_score + new_card.get_card_value > 21
+                    ):  # there was already an ace on the players hand
+                        card.update_value(1)
+                        current_player.update_player_score(-10)

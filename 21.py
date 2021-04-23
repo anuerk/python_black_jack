@@ -39,7 +39,6 @@ while game:
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
 # repr umbau, dass instanzierung möglich ist  card aufbau (tuple) string int, etc
 # intitial - regel anzeigen? ja oder nein
-# bis zu sieben Spieler + input validation für user anzahl (nur int)
 # 6 decks - 52 Blatt, also 312 Karten gespielt
 # black jack ist entweder Ass + 10 oder 7 + 7 + 7 und ist besser als normale 21
 # weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln

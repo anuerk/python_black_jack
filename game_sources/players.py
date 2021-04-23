@@ -55,9 +55,3 @@ class Player:
         for card in self._cards:
             card_list.append(card.display_card)
         return card_list
-
-    def fake_ace_string(self, a_ace_card):
-        """updates the string from ace that it is interpreted with the value of 1"""
-        for card in self._cards:
-            if card._card_number_string == "ACE":
-                card.ace_one_value()

@@ -7,7 +7,7 @@ class Card:
         """create a new card deck object.
 
         Args:
-            type: the type of the card (diamonds ace of spades cross)
+            card_type: the type of the card (diamonds ace of spades cross)
             card_number_string: the number of the card (7, 8, ...... king, ace)
             card_number_int: the integer value of the card
         """
@@ -16,7 +16,7 @@ class Card:
         self._card_number_int = card_number_int
         self._card_number_string = card_number_string
 
-    def __repr__(self):  # Addressat kann auch ein Log-File sein
+    def __repr__(self):
         """Text representation"""
         name = self.__class__.__name__
         # args = repr(self._type + " " + self._number)
@@ -46,5 +46,3 @@ class Card:
         """updates the value of ace - 11 to ace - 1"""
         self._card_number_int = 1
         self._card_number_string = "ACE_1"
-
-
