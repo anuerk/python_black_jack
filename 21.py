@@ -38,5 +38,4 @@ while game:
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
 # intitial - regel anzeigen? ja oder nein
 # 6 decks - 52 Blatt, also 312 Karten gespielt
-# black jack ist entweder Ass + 10 oder 7 + 7 + 7 und ist besser als normale 21
 # weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln

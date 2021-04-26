@@ -12,30 +12,29 @@ class Deck:
         self._cards = []
         self._card_count_total = card_count_total
 
-        # todo card_count_total
         cards_needed = int((card_count_total / 4) + 2)
 
         for _ in range(2, cards_needed):
             if _ == 11:
-                card_value_string = "JACK"
-                card_value_int = 10
+                card_string = "JACK"
+                card_int = 10
             elif _ == 12:
-                card_value_string = "QUEEN"
-                card_value_int = 10
+                card_string = "QUEEN"
+                card_int = 10
             elif _ == 13:
-                card_value_string = "KING"
-                card_value_int = 10
+                card_string = "KING"
+                card_int = 10
             elif _ == 14:
-                card_value_string = "ACE"
-                card_value_int = 11
+                card_string = "ACE"
+                card_int = 11
             else:
-                card_value_int = _
-                card_value_string = str(_)
+                card_int = _
+                card_string = str(_)
 
-            self._cards.append(Card("HEART", card_value_string, card_value_int))
-            self._cards.append(Card("TILE", card_value_string, card_value_int))
-            self._cards.append(Card("PIKE", card_value_string, card_value_int))
-            self._cards.append(Card("CLOVER", card_value_string, card_value_int))
+            self._cards.append(Card("HEART", card_string, card_int))
+            self._cards.append(Card("TILE", card_string, card_int))
+            self._cards.append(Card("PIKE", card_string, card_int))
+            self._cards.append(Card("CLOVER", card_string, card_int))
 
     def __len__(self):
         return len(self._cards)
@@ -45,9 +44,7 @@ class Deck:
             return self._cards[index]
         except IndexError:
             n_cards = len(self)
-            raise IndexError(
-                f"the deck has only {n_cards} cards"
-            ) from None
+            raise IndexError(f"the deck has only {n_cards} cards") from None
 
     def mix_deck(self):
         shuffle(self._cards)

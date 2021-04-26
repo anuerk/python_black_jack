@@ -19,8 +19,10 @@ class Card:
     def __repr__(self):
         """Text representation"""
         name = self.__class__.__name__
-        # args = repr(self._type + " " + self._number)
-        return f"{name} ('{self._type}', '{self._card_number_string}', {self._card_number_int} ) "
+        args = (
+            f"('{self._type}', '{self._card_number_string}', {self._card_number_int} ) "
+        )
+        return f"{name}", args
 
     @property
     def get_card_value(self):

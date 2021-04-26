@@ -77,9 +77,7 @@ class Game:
         while game_active:
             for a_player in players:
 
-                if (
-                        a_player.is_active and a_player.is_dealer is False
-                ):  # human-player
+                if a_player.is_active and a_player.is_dealer is False:  # human-player
                     print(
                         a_player.get_name,
                         " it is your turn. Current cards: ",
@@ -123,16 +121,13 @@ class Game:
         while players[0].get_score < 17:
             new_card = game_cards.take_top_card_from_deck()
             players[0].take_card(new_card)
-            print("Dealer picked new card", new_card.display_card)
+            print("Dealer picked new card:", new_card.display_card)
 
             if players[0].get_score > 21:
                 self.check_ace_options(players[0], new_card)
 
         game_result = self.calculate_round_winner(
-            [
-                {"score": player.get_score, "name": player.get_name}
-                for player in players
-            ]
+            [{"score": player.get_score, "name": player.get_name} for player in players]
         )
         self.print_result(game_result)
 
@@ -215,7 +210,7 @@ class Game:
                 score_list.append(item["score"])
                 name_list.append(item["name"])
 
-            # do we have a push
+            # do we have a push?
             for score, name in zip(score_list, name_list):
                 if score == 21 and name != "Dealer" and score == dealer_score:
                     result_list.append({"score": score, "name": name, "result": "PUSH"})
@@ -249,19 +244,15 @@ class Game:
 
         if winner_count > 1:  # happens when players have the same score
             i = 0
-            if dealer_score == nearest_score:
-                for item in result_list:
-                    if (
-                            item["score"] == dealer_score and item["result"] == "WINS"
-                    ):  # todo blackjack is better than 10 + 5 + 6we have a push
-                        result_list[i]["result"] = "PUSH"
-                    i += 1
-            elif nearest_score == 21:
-                # todo check blackjack
+
+            if nearest_score == 21:
+                # blackjack is better than normal 21
                 black_jack_winners = []
                 for item in result_list:
-                    if item["result"] == "WINS":  # todo blackjack is better than 10 + 5 + 6we have a push
-                        current_player_cards = self.get_player_cards(a_player_name=item["name"])
+                    if item["result"] == "WINS":
+                        current_player_cards = self.get_player_cards(
+                            a_player_name=item["name"]
+                        )
                         player_has_blackjack = self.is_blackjack(current_player_cards)
                         if player_has_blackjack and item["score"] < 22:
                             black_jack_winners.append(item)
@@ -271,6 +262,11 @@ class Game:
                     else:
                         result_list[i]["result"] = "LOSE"
 
+                    i += 1
+            elif dealer_score == nearest_score:
+                for item in result_list:
+                    if item["score"] == dealer_score and item["result"] == "WINS":
+                        result_list[i]["result"] = "PUSH"
                     i += 1
 
         return result_list
@@ -296,9 +292,9 @@ class Game:
                 total_value += card.get_card_value
 
             if (
-                    card_set[0].get_card_value == 7
-                    and card_set[1].get_card_value == 7
-                    and card_set[2].get_card_value == 7
+                card_set[0].get_card_value == 7
+                and card_set[1].get_card_value == 7
+                and card_set[2].get_card_value == 7
             ) or (total_value == 21 and len(card_set) == 2):
                 return True
 
@@ -354,8 +350,8 @@ class Game:
             if current_player.get_score + new_card.get_card_value > 21:
                 for card in current_player.cards:
                     if (
-                            card.get_card_value == 11
-                            and current_player.get_score + new_card.get_card_value > 21
+                        card.get_card_value == 11
+                        and current_player.get_score + new_card.get_card_value > 21
                     ):  # there was already an ace on the players hand
                         card.update_value(1)
                         current_player.update_player_score(-10)
