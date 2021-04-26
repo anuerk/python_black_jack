@@ -1,4 +1,4 @@
-"""A library to play card games (todo)
+"""A library to play card games
 
 This package contains a `Cards`, `Decks` and `Players` modules that define `Card`, `Deck` and `Player`
 """

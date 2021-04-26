@@ -1,12 +1,13 @@
 class Player:
     """A game card player"""
 
-    def __init__(self, name, *, dealer=False):
+    def __init__(self, name, *, dealer=False, stake=0):
         self._cards = []
         self._order = None
         self._active = True  #
         self._score = 0
         self._dealer = dealer
+        self._stakes = stake
         if dealer:
             self._name = "Dealer"
         else:

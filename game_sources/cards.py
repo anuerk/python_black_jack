@@ -20,7 +20,7 @@ class Card:
         """Text representation"""
         name = self.__class__.__name__
         # args = repr(self._type + " " + self._number)
-        return f"{name} ({self._type}, {self._card_number_string}, {self._card_number_int} )  todo"
+        return f"{name} ('{self._type}', '{self._card_number_string}', {self._card_number_int} ) "
 
     @property
     def get_card_value(self):
@@ -41,8 +41,3 @@ class Card:
         """"""
         self._card_number_int = value
         return self
-
-    def ace_one_value(self):  # currently not used
-        """updates the value of ace - 11 to ace - 1"""
-        self._card_number_int = 1
-        self._card_number_string = "ACE_1"

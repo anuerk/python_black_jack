@@ -1,18 +1,12 @@
-from game_sources import Player, Deck
+from game_sources import Player, Deck, Card
 
 
 class Game:
-    def __init__(self, *, game="BlackJack"):
+    def __init__(self):
         """Create a new game.  """
         self._cards = None
         self._players = None
-        if game == "BlackJack":  # maybe more will come
-            self.black_jack()
 
-    def black_jack(self):
-        """logic for a black jack game
-        taken from https://www.bettingexpert.com/de/casino/blackjack/regeln
-        """
         print("")
 
         incorrect_human_input = True
@@ -42,6 +36,7 @@ class Game:
 
         # create card deck and mix
         print("")
+        self._players = players
         game_cards = Deck(card_count_total=52)
         game_cards.mix_deck()
 
@@ -49,46 +44,46 @@ class Game:
         self._cards = game_cards
 
         # first card for all players - public
-        for current_player in players:
-            if current_player.is_dealer is True:
+        for a_player in players:
+            if a_player.is_dealer is True:
                 hole_card = game_cards.take_top_card_from_deck()
-                current_player.take_card(hole_card)
+                a_player.take_card(hole_card)
             else:
                 new_card = game_cards.take_top_card_from_deck()
-                current_player.take_card(new_card)
+                a_player.take_card(new_card)
 
         # second card for all players - public
-        for current_player in players:
-            if current_player.is_dealer is True:
+        for a_player in players:
+            if a_player.is_dealer is True:
                 new_card = game_cards.take_top_card_from_deck()
-                current_player.take_card(new_card)
+                a_player.take_card(new_card)
                 print(
-                    current_player.get_name,
+                    a_player.get_name,
                     "has picked the HOLE CARD and",
                     new_card.display_card,
                 )
             else:
                 new_card = game_cards.take_top_card_from_deck()
-                current_player.take_card(new_card)
+                a_player.take_card(new_card)
                 print(
-                    current_player.get_name,
+                    a_player.get_name,
                     "has picked",
-                    current_player.display_hand_cards(),
+                    a_player.display_hand_cards(),
                 )
 
         print("")
 
         game_active = True
         while game_active:
-            for current_player in players:
+            for a_player in players:
 
                 if (
-                    current_player.is_active and current_player.is_dealer is False
+                        a_player.is_active and a_player.is_dealer is False
                 ):  # human-player
                     print(
-                        current_player.get_name,
+                        a_player.get_name,
                         " it is your turn. Current cards: ",
-                        current_player.display_hand_cards(),
+                        a_player.display_hand_cards(),
                         sep="",
                     )
                     player_decision = input(
@@ -96,25 +91,25 @@ class Game:
                     ).lower()
                     # currently only Stand or hit
                     if player_decision == "no" or player_decision == "n":
-                        current_player.set_player_mode(False)
+                        a_player.set_player_mode(False)
                     elif player_decision == "yes" or player_decision == "y":
                         new_card = game_cards.take_top_card_from_deck()
 
                         # find optimal ace value for player
-                        self.check_ace_options(current_player, new_card)
+                        self.check_ace_options(a_player, new_card)
 
-                        current_player.take_card(new_card)
+                        a_player.take_card(new_card)
 
                         print("")
                         print("you have picked", new_card.display_card)
 
-                    if current_player.get_score > 21:  # already lost?
-                        current_player.set_player_mode(False)
+                    if a_player.get_score > 21:  # already lost?
+                        a_player.set_player_mode(False)
 
-                        if current_player.get_score > 21:
+                        if a_player.get_score > 21:
                             print("BUST - over 21")
                         else:
-                            current_player.set_player_mode(True)
+                            a_player.set_player_mode(True)
 
                     print("")
 
@@ -133,30 +128,24 @@ class Game:
             if players[0].get_score > 21:
                 self.check_ace_options(players[0], new_card)
 
-        ##########################
-        # calculate final result #
-        ##########################
-        final_result = []
-        for player in players:
-            special_result = ""
-
-            player_result = {
-                "score": player.get_score,
-                "name": player.get_name,
-                "add_txt": special_result,
-            }
-            final_result.append(player_result)
-
-        game_result = self.calculate_round_winner(final_result)
+        game_result = self.calculate_round_winner(
+            [
+                {"score": player.get_score, "name": player.get_name}
+                for player in players
+            ]
+        )
         self.print_result(game_result)
 
     @property
-    def get_player(self):
-        """"""
+    def players(self):
         return self._players
 
-    @classmethod
-    def calculate_round_winner(cls, players_and_score):
+    def get_player_by_name(self, name):
+        for _ in self._players:
+            if _.get_name == name:
+                return _
+
+    def calculate_round_winner(self, players_and_score):
         """
         todo too many lists!
         """
@@ -166,6 +155,7 @@ class Game:
         if dealer_score > 21:
             dealer_is_busted = True
         elif dealer_score == 21:
+
             dealer_has_blackjack = True
         # dealer gets special treatment
 
@@ -198,14 +188,18 @@ class Game:
 
         if all_players_busted:
             for item in list_ordered_by_score:
-                list_item = {"score": item["score"], "name": item["name"], "result": "BUST"}
+                list_item = {
+                    "score": item["score"],
+                    "name": item["name"],
+                    "result": "BUST",
+                }
                 result_list.append(list_item)
         elif dealer_is_busted:
             for item in list_ordered_by_score:
                 if item["score"] <= 21 and item["name"] != "Dealer":
                     score_list.append(item["score"])
                     name_list.append(item["name"])
-                    player_result.append("WINS")  # todo do we need wins?
+                    player_result.append("WINS")
                     winner_count += 1
                 else:
                     score_list.append(item["score"])
@@ -227,7 +221,7 @@ class Game:
                     result_list.append({"score": score, "name": name, "result": "PUSH"})
                     winner_count += 1
                 elif score == 21 and name == "Dealer":
-                    result_list.append({"score": score, "name": name, "result": "WINS i think not! remove the elif"})
+                    result_list.append({"score": score, "name": name, "result": "WINS"})
                     winner_count += 1
                 else:
                     result_list.append({"score": score, "name": name, "result": "LOSE"})
@@ -255,12 +249,29 @@ class Game:
 
         if winner_count > 1:  # happens when players have the same score
             i = 0
-            for item in result_list:
-                if (
-                    item["score"] == dealer_score and item["result"] == "WINS"
-                ):  # #todo blackjack is better than 10 + 5 + 6we have a push
-                    result_list[i]["result"] = "PUSH"
-                i += 1
+            if dealer_score == nearest_score:
+                for item in result_list:
+                    if (
+                            item["score"] == dealer_score and item["result"] == "WINS"
+                    ):  # todo blackjack is better than 10 + 5 + 6we have a push
+                        result_list[i]["result"] = "PUSH"
+                    i += 1
+            elif nearest_score == 21:
+                # todo check blackjack
+                black_jack_winners = []
+                for item in result_list:
+                    if item["result"] == "WINS":  # todo blackjack is better than 10 + 5 + 6we have a push
+                        current_player_cards = self.get_player_cards(a_player_name=item["name"])
+                        player_has_blackjack = self.is_blackjack(current_player_cards)
+                        if player_has_blackjack and item["score"] < 22:
+                            black_jack_winners.append(item)
+                            result_list[i]["result"] = "WINS"
+                        else:
+                            result_list[i]["result"] = "LOSE"
+                    else:
+                        result_list[i]["result"] = "LOSE"
+
+                    i += 1
 
         return result_list
 
@@ -277,13 +288,17 @@ class Game:
         """check if the cards are a blackjack"""
         total_value = 0
         if len(card_set) == 2 or len(card_set) == 3:
-            for _ in card_set:
-                total_value += _.get_card_value
+
+            for card in card_set:
+                if isinstance(card, str):  # could be better todo
+                    tmp_card = card.split()
+                    card = Card(tmp_card[0], tmp_card[1], tmp_card[1])
+                total_value += card.get_card_value
 
             if (
-                card_set[0].get_card_value == 7
-                and card_set[1].get_card_value == 7
-                and card_set[2].get_card_value == 7
+                    card_set[0].get_card_value == 7
+                    and card_set[1].get_card_value == 7
+                    and card_set[2].get_card_value == 7
             ) or (total_value == 21 and len(card_set) == 2):
                 return True
 
@@ -339,8 +354,12 @@ class Game:
             if current_player.get_score + new_card.get_card_value > 21:
                 for card in current_player.cards:
                     if (
-                        card.get_card_value == 11
-                        and current_player.get_score + new_card.get_card_value > 21
+                            card.get_card_value == 11
+                            and current_player.get_score + new_card.get_card_value > 21
                     ):  # there was already an ace on the players hand
                         card.update_value(1)
                         current_player.update_player_score(-10)
+
+    def get_player_cards(self, *, a_player_name):
+        player = self.get_player_by_name(a_player_name)
+        return player.cards

@@ -22,7 +22,7 @@ while game:
                 print(rules)
 
     # general game loop
-    black_jack = Game(game="BlackJack")
+    black_jack = Game()
 
     y_or_n = input(
         "Game over - new round? (yes or no)"
@@ -35,9 +35,7 @@ while game:
 
 # Todo:
 # Geld Eisatz
-# dealer zählt anders
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
-# repr umbau, dass instanzierung möglich ist  card aufbau (tuple) string int, etc
 # intitial - regel anzeigen? ja oder nein
 # 6 decks - 52 Blatt, also 312 Karten gespielt
 # black jack ist entweder Ass + 10 oder 7 + 7 + 7 und ist besser als normale 21
