@@ -15,15 +15,6 @@ class Deck:
         # todo card_count_total
         cards_needed = int((card_count_total / 4) + 2)
 
-        """    todo
-# define the card ranks, and suits
-ranks = [_ for _ in range(2, 11)] + ['JACK', 'QUEEN', 'KING', 'ACE']
-suits = ['SPADE', 'HEART ', 'DIAMOND', 'CLUB']
-
-def get_deck():
-    #Return a new deck of cards.
-    return [[rank, suit] for rank in ranks for suit in suits]"""
-
         for _ in range(2, cards_needed):
             if _ == 11:
                 card_value_string = "JACK"

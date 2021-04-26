@@ -138,12 +138,7 @@ class Game:
         ##########################
         final_result = []
         for player in players:
-            if player.get_score > 21:
-                special_result = "BUST"
-            elif self.is_blackjack(player.cards):
-                special_result = "BLACKJACK"
-            else:
-                special_result = ""
+            special_result = ""
 
             player_result = {
                 "score": player.get_score,
@@ -162,17 +157,18 @@ class Game:
 
     @classmethod
     def calculate_round_winner(cls, players_and_score):
-        """"""
+        """
+        todo too many lists!
+        """
         dealer_is_busted = False
         dealer_has_blackjack = False
         dealer_score = players_and_score[0]["score"]
-        dealer_txt = players_and_score[0]["add_txt"]
-        if dealer_txt == "BUST":
+        if dealer_score > 21:
             dealer_is_busted = True
-        elif dealer_txt == "BLACKJACK":
+        elif dealer_score == 21:
             dealer_has_blackjack = True
         # dealer gets special treatment
-        # del players_and_score[0]
+
         list_ordered_by_score = sorted(
             players_and_score, key=lambda k: k["score"], reverse=True
         )
@@ -184,8 +180,12 @@ class Game:
             score for score in score_list_filtered if score <= 21
         ]  # remove scores to high
 
-        # https://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value
-        nearest_score = min(score_list_filtered, key=lambda x: abs(x - 21))
+        all_players_busted = all(i > 21 for i in score_list_filtered)
+
+        if all_players_busted is False:
+            # https://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value
+            nearest_score = min(score_list_filtered, key=lambda x: abs(x - 21))
+
         nearest_hit_count = 0  # multiple players & same score?
 
         winner_count = 0
@@ -196,7 +196,11 @@ class Game:
         name_list = []
         player_result = []
 
-        if dealer_is_busted:
+        if all_players_busted:
+            for item in list_ordered_by_score:
+                list_item = {"score": item["score"], "name": item["name"], "result": "BUST"}
+                result_list.append(list_item)
+        elif dealer_is_busted:
             for item in list_ordered_by_score:
                 if item["score"] <= 21 and item["name"] != "Dealer":
                     score_list.append(item["score"])
@@ -219,11 +223,11 @@ class Game:
 
             # do we have a push
             for score, name in zip(score_list, name_list):
-                if score == 21 and name != "Dealer":
+                if score == 21 and name != "Dealer" and score == dealer_score:
                     result_list.append({"score": score, "name": name, "result": "PUSH"})
                     winner_count += 1
                 elif score == 21 and name == "Dealer":
-                    result_list.append({"score": score, "name": name, "result": "WINS"})
+                    result_list.append({"score": score, "name": name, "result": "WINS i think not! remove the elif"})
                     winner_count += 1
                 else:
                     result_list.append({"score": score, "name": name, "result": "LOSE"})
@@ -249,10 +253,7 @@ class Game:
 
                 result_list.append(list_item)
 
-        if winner_count == 0:
-            print("This should never happen ;)")
-            print("nearest_score", nearest_score)
-        elif winner_count > 1:  # happens when players have the same score
+        if winner_count > 1:  # happens when players have the same score
             i = 0
             for item in result_list:
                 if (
