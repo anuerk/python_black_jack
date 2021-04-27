@@ -5,51 +5,95 @@ class Game:
     def __init__(self):
         """Create a new game.  """
         self._cards = None
-        self._players = None
+        self._players = []
         self._game_result = None
         self._current_player_card_set = None
         self._current_player_new_card = None
         self._current_player = None
         self._nearest_score = 0
+        self._player_count = 0
 
+        game = True
+        initial_game = True
+
+        while game:
+            if initial_game:
+                rules = "\nBlack jack Rules:\nHave fun!"
+                user_input = input(
+                    "\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) "
+                )
+
+                if user_input == "yes" or user_input == "y":
+                    print(rules)  # todo
+
+                while user_input == "":
+                    user_input = input("You did not enter enything. How is your answer? ")
+                    if user_input == "yes":
+                        print(rules)
+
+                incorrect_human_input = True
+                while incorrect_human_input:
+                    try:
+                        self._player_count  = int(input("How many people want to play? "))
+                        if self._player_count  < 1 or self._player_count  > 7:
+                            print("Please insert a number (1 - 7)")
+                        else:
+                            incorrect_human_input = False
+                    except ValueError:
+                        print("Please insert a number (1 - 7)")
+
+                # initialise players
+                self._players = [Player("Dealer", dealer=True)]
+
+                for _ in range(0, self._player_count):
+                    incorrect_human_input = True
+                    while incorrect_human_input:
+                        player_name = input("Please insert player name: ")
+                        if player_name in ('', 'Dealer'):
+                            print("Name is not allowed")
+                        else:
+                            self._players.append(Player(player_name))
+                            incorrect_human_input = False
+            else:
+                self._cards = None
+                self._game_result = None
+                self._current_player_card_set = None
+                self._current_player_new_card = None
+                self._current_player = None
+                self._nearest_score = 0
+
+                # spieler verlieren ihre karten
+                for a_player in self._players:
+                    a_player.reset_round()
+
+
+            # general game loop
+            self.play_round()
+
+            y_or_n = input(
+                "Game over - new round? (yes or no)"
+            )  # todo - same settings as before? so no need to enter
+            if y_or_n == "no" or y_or_n == "n":
+                game = False
+            else:
+                initial_game = False
+
+    def play_round(self):
         print("")
-
-        incorrect_human_input = True
-        player_count = 0
-        while incorrect_human_input:
-            try:
-                player_count = int(input("How many people want to play? "))
-                if player_count < 1 or player_count > 7:
-                    print("Please insert a number (1 - 7)")
-                else:
-                    incorrect_human_input = False
-            except ValueError:
-                print("Please insert a number (1 - 7)")
-
-        # initialise players
-        players = [Player("Dealer", dealer=True)]
-
-        for _ in range(0, player_count):
-            incorrect_human_input = True
-            while incorrect_human_input:
-                player_name = input("Please insert player name: ")
-                if player_name in ('', 'Dealer'):
-                    print("Name is not allowed")
-                else:
-                    players.append(Player(player_name))
-                    incorrect_human_input = False
 
         # create card deck and mix
         print("")
-        self._players = players
+
         game_cards = Deck(card_count_total=52)
         game_cards.mix_deck()
 
-        self._players = players
         self._cards = game_cards
 
         # first card for all players - public
-        for a_player in players:
+        print("test", self._players)
+
+        for a_player in self._players:
+            print("a_player", a_player)
             if a_player.is_dealer is True:
                 hole_card = game_cards.take_top_card_from_deck()
                 a_player.take_card(hole_card)
@@ -58,7 +102,7 @@ class Game:
                 a_player.take_card(new_card)
 
         # second card for all players - public
-        for a_player in players:
+        for a_player in self._players:
             if a_player.is_dealer is True:
                 new_card = game_cards.take_top_card_from_deck()
                 a_player.take_card(new_card)
@@ -80,7 +124,7 @@ class Game:
 
         game_active = True
         while game_active:
-            for a_player in players:
+            for a_player in self._players:
                 self._current_player = a_player
                 if a_player.is_active and a_player.is_dealer is False:  # human-player
                     print(
@@ -128,17 +172,17 @@ class Game:
         print("Dealer Hole card:", hole_card.display_card)
 
         # dealer must have at least a score of 17
-        self._current_player = players[0]
-        while players[0].get_score < 17:
+        self._current_player = self._players[0]
+        while self._players[0].get_score < 17:
             self._current_player_new_card = game_cards.take_top_card_from_deck()
-            players[0].take_card(new_card)
+            self._players[0].take_card(new_card)
             print("Dealer picked new card:", new_card.display_card)
 
-            if players[0].get_score > 21:
+            if self._players[0].get_score > 21:
                 self.check_ace_options()
 
         self._game_result = self.calculate_round_winner(
-            [{"score": player.get_score, "name": player.get_name} for player in players]
+            [{"score": player.get_score, "name": player.get_name} for player in self._players]
         )
         self.print_result()
 

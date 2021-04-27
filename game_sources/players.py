@@ -56,3 +56,8 @@ class Player:
         for card in self._cards:
             card_list.append(card.display_card)
         return card_list
+
+    def reset_round(self):
+        self._cards = []
+        self._active = True
+        self._score = 0
