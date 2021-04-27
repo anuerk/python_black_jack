@@ -33,7 +33,7 @@ class Game:
             incorrect_human_input = True
             while incorrect_human_input:
                 player_name = input("Please insert player name: ")
-                if player_name == "" or player_name == "Dealer":
+                if player_name in ('', 'Dealer'):
                     print("Name is not allowed")
                 else:
                     players.append(Player(player_name))
@@ -93,9 +93,9 @@ class Game:
                         "Do you want a new card? (yes or no) "
                     ).lower()
                     # currently only Stand or hit
-                    if player_decision == "no" or player_decision == "n":
+                    if player_decision in ('no', 'n'):
                         a_player.set_player_mode(False)
-                    elif player_decision == "yes" or player_decision == "y":
+                    elif player_decision in ('yes', 'y'):
                         self._current_player_new_card = (
                             game_cards.take_top_card_from_deck()
                         )

@@ -22,24 +22,21 @@ class Card:
         args = (
             f"('{self._type}', '{self._card_number_string}', {self._card_number_int} ) "
         )
-        return f"{name}", args
+        return_string = f"{name}", args
+        return str(return_string)
 
     @property
     def get_card_value(self):
-        """"""
         return self._card_number_int
 
     @property
     def get_card_string(self):
-        """"""
         return self._card_number_string
 
     @property
     def display_card(self):
-        """"""
         return self._type + " " + self._card_number_string
 
-    def update_value(self, value):  # currently not used
-        """"""
+    def update_value(self, value):
         self._card_number_int = value
         return self
