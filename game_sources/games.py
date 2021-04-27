@@ -6,6 +6,7 @@ class Game:
         """Create a new game.  """
         self._cards = None
         self._players = None
+        self._game_result = None
 
         print("")
 
@@ -111,7 +112,7 @@ class Game:
 
                     print("")
 
-            if self.all_human_players_finished(players):
+            if self.all_human_players_finished():
                 game_active = False
 
         print("")
@@ -126,10 +127,10 @@ class Game:
             if players[0].get_score > 21:
                 self.check_ace_options(players[0], new_card)
 
-        game_result = self.calculate_round_winner(
+        self._game_result = self.calculate_round_winner(
             [{"score": player.get_score, "name": player.get_name} for player in players]
         )
-        self.print_result(game_result)
+        self.print_result()
 
     @property
     def players(self):
@@ -271,8 +272,8 @@ class Game:
 
         return result_list
 
-    def all_human_players_finished(self, human_player_list):
-        for _ in human_player_list:
+    def all_human_players_finished(self):
+        for _ in self._players:
             if _.is_active and _.is_dealer is False:
                 return False
 
@@ -298,7 +299,7 @@ class Game:
 
         return False
 
-    def print_result(self, game_result):  # ide hint should be static? todo
+    def print_result(self):  # ide hint should be static? todo
         """gets a list with players: score, name, result
         and prints it
         """
@@ -308,7 +309,7 @@ class Game:
         print("|____________________________________________________________|")
         print("|    Name                       |       Result   |   Score   |")
         print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
-        for player in game_result:
+        for player in self._game_result:
             print(
                 "|  ",
                 "{0: <27}".format(player["name"]),
