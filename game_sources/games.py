@@ -1,83 +1,113 @@
+"""This module does define the game logic. it uses players, decks, cards and the game class"""
+
 from game_sources import Player, Deck, Card
 
 
 class Game:
+    """defines the main game logic"""
+
     def __init__(self):
         """Create a new game.  """
-        self._cards = None
-        self._players = []
-        self._game_result = None
-        self._current_player_card_set = None
+        self._cards = None  # the cards in the game
+        self._players = []  # a list of players
+        self._game_result = None  # result of the round
+        self._current_player_card_set = None  #
         self._current_player_new_card = None
         self._current_player = None
         self._nearest_score = 0
         self._player_count = 0
 
         game = True
-        initial_game = True
+        self._initial_game = True
 
         while game:
-            if initial_game:
-                rules = "\nBlack jack Rules:\nHave fun!"
-                user_input = input(
-                    "\nWelcome to 21, Black Jack! \n\nWould you like to read the game and program instructions? (yes or no) "
-                )
-
-                if user_input == "yes" or user_input == "y":
-                    print(rules)  # todo
-
-                while user_input == "":
-                    user_input = input("You did not enter Anything. How is your answer? ")
-                    if user_input == "yes":
-                        print(rules)
-
-                incorrect_human_input = True
-                while incorrect_human_input:
-                    try:
-                        self._player_count = int(input("How many people want to play? "))
-                        if self._player_count < 1 or self._player_count > 7:
-                            print("Please insert a number (1 - 7)")
-                        else:
-                            incorrect_human_input = False
-                    except ValueError:
-                        print("Please insert a number (1 - 7)")
-
-                # initialise players
-                self._players = [Player("Dealer", dealer=True)]
-
-                for _ in range(0, self._player_count):
-                    incorrect_human_input = True
-                    while incorrect_human_input:
-                        player_name = input("Please insert player name: ")
-                        if player_name in ('', 'Dealer'):
-                            print("Name is not allowed")
-                        else:
-                            self._players.append(Player(player_name))
-                            incorrect_human_input = False
+            if self._initial_game:
+                self.start_game_round()
             else:
-                self._cards = None
-                self._game_result = None
-                self._current_player_card_set = None
-                self._current_player_new_card = None
-                self._current_player = None
-                self._nearest_score = 0
-
-                # reset player properties
-                for a_player in self._players:
-                    a_player.reset_round()
+                self.reset_round()
 
             # general game loop
             self.play_round()
 
-            y_or_n = input(
-                "Game over - new round? (yes or no)"
-            )  # todo - same settings as before? so no need to enter
-            if y_or_n == "no" or y_or_n == "n":
+            y_or_n = input("Game over - new round? (yes or no)")
+            if y_or_n in ("no", "n"):
                 game = False
             else:
-                initial_game = False
+                self._initial_game = False
+
+    @staticmethod
+    def print_rules():
+        """just prints the black jack rules"""
+        print(
+            "\n"
+            + "Black jack Rules:\n\n"
+            + "Starting value: $ 1000 \n\n"
+            + "Card values:\n\n"
+            + "Numbers: numerical value, 2-9 points\n"
+            + "Jack, queen, king: 10 points\n"
+            + "Ace: 1 or 11 points\n\n"
+            + "Aim:\n\n"
+            + "The object of the game is to reach 21 points or to be closer to 21 than the dealer. "
+            + "If the 21 is exceeded, you have overbought and lose your stake. "
+            + "If you are closer to 21 than the dealer you get double your stake, "
+            + "with a blackjack you get back 2.5 times. In the event of a tie,"
+            + " everyone receives their stake again.\nHave fun!\n"
+        )
+
+    def start_game_round(self):
+        """initialize the black jack game"""
+        print("Welcome to 21, Black Jack!")
+        user_input = input(
+            "Would you like to read the game and program instructions? (yes or no) "
+        )
+
+        if user_input in ("yes", "y"):
+            self.print_rules()
+
+        while user_input == "":
+            user_input = input("You did not enter Anything. How is your answer? ")
+            if user_input == "yes":
+                self.print_rules()
+
+        incorrect_human_input = True
+        while incorrect_human_input:
+            try:
+                self._player_count = int(input("How many people want to play? "))
+                if self._player_count < 1 or self._player_count > 7:
+                    print("Please insert a number (1 - 7)")
+                else:
+                    incorrect_human_input = False
+            except ValueError:
+                print("Please insert a number (1 - 7)")
+
+        # initialise players
+        self._players = [Player("Dealer", dealer=True)]
+
+        for _ in range(0, self._player_count):
+            incorrect_human_input = True
+            while incorrect_human_input:
+                player_name = input("Please insert player name: ")
+                if player_name in ("", "Dealer"):
+                    print("Name is not allowed")
+                else:
+                    self._players.append(Player(player_name))
+                    incorrect_human_input = False
+
+    def reset_round(self):
+        """resets all round properties of the game"""
+        self._cards = None
+        self._game_result = None
+        self._current_player_card_set = None
+        self._current_player_new_card = None
+        self._current_player = None
+        self._nearest_score = 0
+
+        # reset player properties
+        for a_player in self._players:
+            a_player.reset_round()
 
     def play_round(self):
+        """start a round for the black jack game"""
 
         print("")
 
@@ -93,10 +123,15 @@ class Game:
                 hole_card = game_cards.take_top_card_from_deck()
                 a_player.take_card(hole_card)
             else:
-                a_player._bet_current_round = int(input(a_player.get_name
-                                                        +" it is your turn. still available: "
-                                                        + str(a_player.bet_available)
-                                                        + ". How much is your bet?"))
+                players_bet = int(
+                    input(
+                        a_player.get_name
+                        + " it is your turn. still available: "
+                        + str(a_player.bet_available)
+                        + ". How much is your bet?"
+                    )
+                )
+                a_player.set_bet_current_round(players_bet)
                 new_card = game_cards.take_top_card_from_deck()
                 a_player.take_card(new_card)
 
@@ -136,9 +171,9 @@ class Game:
                         "Do you want a new card? (yes or no) "
                     ).lower()
                     # currently only Stand or hit
-                    if player_decision in ('no', 'n'):
+                    if player_decision in ("no", "n"):
                         a_player.set_player_mode(False)
-                    elif player_decision in ('yes', 'y'):
+                    elif player_decision in ("yes", "y"):
                         self._current_player_new_card = (
                             game_cards.take_top_card_from_deck()
                         )
@@ -174,22 +209,28 @@ class Game:
         self._current_player = self._players[0]
         while self._players[0].get_score < 17:
             self._current_player_new_card = game_cards.take_top_card_from_deck()
-            self._players[0].take_card(new_card)
-            print("Dealer picked new card:", new_card.display_card)
+            self._players[0].take_card(self._current_player_new_card)
+            print("Dealer picked new card:", self._current_player_new_card.display_card)
 
             if self._players[0].get_score > 21:
                 self.check_ace_options()
 
         self._game_result = self.calculate_round_winner(
-            [{"score": player.get_score, "name": player.get_name} for player in self._players]
+            [
+                {"score": player.get_score, "name": player.get_name}
+                for player in self._players
+            ]
         )
         self.print_result()
 
     @property
     def players(self):
+        """returns the current game players"""
         return self._players
 
     def get_player_by_name(self, name):
+        """gets a players name an returns the player object"""
+
         for _ in self._players:
             if _.get_name == name:
                 return _
@@ -205,8 +246,6 @@ class Game:
             dealer_is_busted = True
         elif dealer_score == 21:
             dealer_has_blackjack = True
-
-        # dealer gets special treatment
 
         list_ordered_by_score = sorted(
             players_and_score, key=lambda k: k["score"], reverse=True
@@ -238,12 +277,14 @@ class Game:
             print("debug: 191 all players busted")
             for item in list_ordered_by_score:
                 current_player = self.get_player_by_name(item["name"])
-                current_player.update_player_bet_rest((current_player.bet_current_round * -1))
+                current_player.update_player_bet_rest(
+                    (current_player.bet_current_round * -1)
+                )
                 list_item = {
                     "score": item["score"],
                     "name": item["name"],
                     "result": "BUST",
-                    "bet_result": current_player.bet_available
+                    "bet_result": current_player.bet_available,
                 }
                 result_list.append(list_item)
         elif dealer_is_busted:
@@ -252,26 +293,31 @@ class Game:
                 current_player = self.get_player_by_name(item["name"])
 
                 if item["score"] <= 21 and item["name"] != "Dealer":
-                    current_player.update_player_bet_rest(current_player.bet_current_round)
+                    current_player.update_player_bet_rest(
+                        current_player.bet_current_round
+                    )
                     print("debug 209 if", item)
                     result_list.append(
-                    {
-                        "score": item["score"],
-                        "name": item["name"],
-                        "result": "WINS",
-                        "bet_result": current_player.bet_available,
-                    })
-                    winner_count += 1
+                        {
+                            "score": item["score"],
+                            "name": item["name"],
+                            "result": "WINS",
+                            "bet_result": current_player.bet_available,
+                        }
+                    )
                 else:
                     print("debug 213 else", item)
-                    current_player.update_player_bet_rest(current_player.bet_current_round * -1)
+                    current_player.update_player_bet_rest(
+                        current_player.bet_current_round * -1
+                    )
                     result_list.append(
-                    {
-                        "score": item["score"],
-                        "name": item["name"],
-                        "result": "LOSE",
-                        "bet_result": current_player.bet_available,
-                    })
+                        {
+                            "score": item["score"],
+                            "name": item["name"],
+                            "result": "LOSE",
+                            "bet_result": current_player.bet_available,
+                        }
+                    )
                     loser_count += 1
 
         elif dealer_has_blackjack:
@@ -285,50 +331,81 @@ class Game:
                 current_player = self.get_player_by_name(name)
                 if score == 21 and name != "Dealer" and score == dealer_score:
                     current_player.update_player_bet_rest(0)
-
-                    result_list.append({"score": score, "name": name, "result": "PUSH", "bet_result": current_player.bet_available})
+                    result = "PUSH"
                     winner_count += 1
                 elif score == 21 and name == "Dealer":
-                    current_player.update_player_bet_rest(current_player.bet_current_round)
-                    result_list.append({"score": score, "name": name, "result": "WINS", "bet_result": current_player.bet_available})
+                    current_player.update_player_bet_rest(
+                        current_player.bet_current_round
+                    )
+                    result = "WINS"
                     winner_count += 1
                 else:
-                    current_player.update_player_bet_rest((current_player.bet_current_round * -1))
-                    result_list.append({"score": score, "name": name, "result": "LOSE", "bet_result": current_player.bet_available})
+                    current_player.update_player_bet_rest(
+                        (current_player.bet_current_round * -1)
+                    )
+                    result = "LOSE"
                     loser_count += 1
+
+                result_list.append(
+                    {
+                        "score": score,
+                        "name": name,
+                        "result": result,
+                        "bet_result": current_player.bet_available,
+                    }
+                )
 
         else:  # most probably case
             print("debug: 235 else")
+            print("list_ordered_by_score", list_ordered_by_score)
             for item in list_ordered_by_score:
                 score_list.append(item["score"])
                 name_list.append(item["name"])
 
             for score, name in zip(score_list, name_list):
                 current_player = self.get_player_by_name(name)
+
                 if score > 21:
-                    current_player.update_player_bet_rest((current_player.bet_current_round * -1))
+                    current_player.update_player_bet_rest(
+                        (current_player.bet_current_round * -1)
+                    )
                     list_item = {
                         "score": score,
                         "name": name,
                         "result": "LOSE",
-                        "bet_result": current_player.bet_available}
+                        "bet_result": current_player.bet_available,
+                    }
                     loser_count += 1
                 else:
                     if score == self._nearest_score:
-                        current_player.update_player_bet_rest((current_player.bet_current_round ))
-                        list_item = {"score": score, "name": name, "result": "WINS", "bet_result": current_player.bet_available}
+                        current_player.update_player_bet_rest(
+                            current_player.bet_current_round
+                        )
+                        list_item = {
+                            "score": score,
+                            "name": name,
+                            "result": "WINS",
+                            "bet_result": current_player.bet_available,
+                        }
                         winner_count += 1
                         nearest_hit_count += 1
                     else:
-                        current_player.update_player_bet_rest((current_player.bet_current_round * -1))
-                        list_item = {"score": score, "name": name, "result": "LOSE", "bet_result": current_player.bet_available}
+                        current_player.update_player_bet_rest(
+                            (current_player.bet_current_round * -1)
+                        )
+                        list_item = {
+                            "score": score,
+                            "name": name,
+                            "result": "LOSE",
+                            "bet_result": current_player.bet_available,
+                        }
                         loser_count += 1
 
                 result_list.append(list_item)
 
         if winner_count > 1:  # happens when players have the same score
             i = 0
-            print("multiople winners here")
+            print("multiple winners here")
             if self._nearest_score == 21:
                 # blackjack is better than normal 21
                 black_jack_winners = []
@@ -353,13 +430,18 @@ class Game:
                     if item["score"] == dealer_score and item["result"] == "WINS":
                         result_list[i]["result"] = "PUSH"
                         current_player = self.get_player_by_name(item["name"])
-                        current_player.update_player_bet_rest(0 - current_player.bet_current_round)
+                        print("players bet amount total:", current_player.bet_available)
+                        print(
+                            "players bet this round:", current_player.bet_current_round
+                        )
+                        current_player.update_player_bet_rest(0)
 
                     i += 1
 
         return result_list
 
     def all_human_players_finished(self):
+        """checks if all humans are finished"""
         for _ in self._players:
             if _.is_active and _.is_dealer is False:
                 return False
@@ -370,8 +452,8 @@ class Game:
         """check if the cards are a blackjack"""
         total_value = 0
         if (
-                len(self._current_player_card_set) == 2
-                or len(self._current_player_card_set) == 3
+            len(self._current_player_card_set) == 2
+            or len(self._current_player_card_set) == 3
         ):
 
             for card in self._current_player_card_set:
@@ -381,9 +463,9 @@ class Game:
                 total_value += card.get_card_value
 
             if (
-                    self._current_player_card_set[0].get_card_value == 7
-                    and self._current_player_card_set[1].get_card_value == 7
-                    and self._current_player_card_set[2].get_card_value == 7
+                self._current_player_card_set[0].get_card_value == 7
+                and self._current_player_card_set[1].get_card_value == 7
+                and self._current_player_card_set[2].get_card_value == 7
             ) or (total_value == 21 and len(self._current_player_card_set) == 2):
                 return True
 
@@ -395,11 +477,22 @@ class Game:
         """
 
         print("")
-        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
-        print("|                ROUND OVER                                              |")
-        print("|________________________________________________________________________|")
-        print("|    Name                       |   Result   |   Score   |  Bet account  |")
-        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
+        print(
+            "|------------------------------------------------------------------------|"
+        )
+        print(
+            "|                ROUND OVER                                              |"
+        )
+        print(
+            "|________________________________________________________________________|"
+        )
+        print(
+            "|    Name                       |   Result   |   Score   |  Bet account  |"
+        )
+        print(
+            "|------------------------------------------------------------------------|"
+        )
+
         for player in self._game_result:
 
             if player["name"] != "Dealer":
@@ -408,11 +501,11 @@ class Game:
                     "{0: <27}".format(player["name"]),
                     "|   ",
                     "{0: <8}".format(player["score"]),
-                    "|    ",
+                    "|   ",
                     "{0: <5}".format(player["result"]),
-                    "|",
+                    "|   ",
                     "{0: <5}".format(player["bet_result"]),
-                    "|",
+                    "     |",
                 )
             else:
                 print(
@@ -420,12 +513,15 @@ class Game:
                     "{0: <27}".format(player["name"]),
                     "|   ",
                     "{0: <8}".format(player["score"]),
-                    "|    ",
+                    "|   ",
                     "{0: <5}".format(player["result"]),
                     "|",
-
+                    "              |",
                 )
-        print("|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|")
+        print(
+            "|------------------------------------------------------------------------|"
+        )
+
         print("")
 
     def check_ace_options(self):
@@ -444,30 +540,31 @@ class Game:
             ace_count += 1
 
         if (
-                ace_count > 0
-                and self._current_player.get_score
-                + self._current_player_new_card.get_card_value
-                > 21
+            ace_count > 0
+            and self._current_player.get_score
+            + self._current_player_new_card.get_card_value
+            > 21
         ):
             # problem is the new ace?
             if self._current_player_new_card.get_card_value == 11:
                 self._current_player_new_card.update_value(1)
 
             if (
-                    self._current_player.get_score
-                    + self._current_player_new_card.get_card_value
-                    > 21
+                self._current_player.get_score
+                + self._current_player_new_card.get_card_value
+                > 21
             ):
                 for card in self._current_player.cards:
                     if (
-                            card.get_card_value == 11
-                            and self._current_player.get_score
-                            + self._current_player_new_card.get_card_value
-                            > 21
+                        card.get_card_value == 11
+                        and self._current_player.get_score
+                        + self._current_player_new_card.get_card_value
+                        > 21
                     ):  # there was already an ace on the players hand
                         card.update_value(1)
                         self._current_player.update_player_score(-10)
 
     def get_player_cards(self, *, a_player_name):
+        """returns the current card deck from a player"""
         player = self.get_player_by_name(a_player_name)
         return player.cards

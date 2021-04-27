@@ -1,13 +1,11 @@
+"""This module does define a card deck for a black jack game"""
+
 from random import shuffle
 from game_sources.cards import Card
 
 
-
 class Deck:
-    """A one-dimensional vector from linear algebra.
-
-    All entries are stored as float's.
-    """
+    """A blueprint for a game card deck"""
 
     def __init__(self, *, card_count_total=52):
         self._cards = []
@@ -48,7 +46,9 @@ class Deck:
             raise IndexError(f"the deck has only {n_cards} cards") from None
 
     def mix_deck(self):
+        """mixes a given card deck"""
         shuffle(self._cards)
 
     def take_top_card_from_deck(self):
+        """returns the first card from a deck of cards"""
         return self._cards.pop()
