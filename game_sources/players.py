@@ -8,9 +8,14 @@ class Player:
         self._score = 0
         self._dealer = dealer
         self._stakes = stake
+
         if dealer:
             self._name = "Dealer"
+            self._bet_available = 1000
+            self._bet_current_round = 999999
         else:
+            self._bet_available = 1000
+            self._bet_current_round = 0
             self._name = name
 
     def __repr__(self):
@@ -21,6 +26,14 @@ class Player:
     def take_card(self, card):
         self.update_player_score(card.get_card_value)
         self._cards.append(card)
+
+    @property
+    def bet_available(self):
+        return self._bet_available
+
+    @property
+    def bet_current_round(self):
+        return self._bet_current_round
 
     @property
     def cards(self):
@@ -61,3 +74,11 @@ class Player:
         self._cards = []
         self._active = True
         self._score = 0
+
+    def update_player_bet_rest(self, number):
+        print("debug update_player_bet_rest")
+        print(self.get_name)
+        print("bevore", self._bet_available)
+        self._bet_available += number
+        print("geändert um", number)
+        print("after", self._bet_available)

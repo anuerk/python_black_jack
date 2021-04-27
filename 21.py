@@ -14,4 +14,5 @@ black_jack = Game()
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
 # intitial - regel anzeigen? ja oder nein
 # 6 decks - 52 Blatt, also 312 Karten gespielt
-# weitere optionen split, double, insurance https://www.bettingexpert.com/de/casino/blackjack/regeln
+# weitere optionen split, double, insurance
+# #https://www.bettingexpert.com/de/casino/blackjack/regeln
