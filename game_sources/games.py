@@ -96,7 +96,9 @@ class Game:
                     if player_decision == "no" or player_decision == "n":
                         a_player.set_player_mode(False)
                     elif player_decision == "yes" or player_decision == "y":
-                        self._current_player_new_card = game_cards.take_top_card_from_deck()
+                        self._current_player_new_card = (
+                            game_cards.take_top_card_from_deck()
+                        )
 
                         # find optimal ace value for player
                         self.check_ace_options()
@@ -104,7 +106,10 @@ class Game:
                         a_player.take_card(self._current_player_new_card)
 
                         print("")
-                        print("you have picked", self._current_player_new_card.display_card)
+                        print(
+                            "you have picked",
+                            self._current_player_new_card.display_card,
+                        )
 
                     if a_player.get_score > 21:  # already lost?
                         a_player.set_player_mode(False)
@@ -185,10 +190,9 @@ class Game:
         result_list = []
         score_list = []
         name_list = []
-        player_result = []
 
         if all_players_busted:
-            print("debug: 191 all plyers busted")
+            print("debug: 191 all players busted")
             for item in list_ordered_by_score:
                 list_item = {
                     "score": item["score"],
@@ -197,21 +201,16 @@ class Game:
                 }
                 result_list.append(list_item)
         elif dealer_is_busted:
-            print("debug: 200 dealer busted")
+            print("debug: 200 dealer busted maybe still a bug")
             for item in list_ordered_by_score:
                 if item["score"] <= 21 and item["name"] != "Dealer":
-                    score_list.append(item["score"])
-                    name_list.append(item["name"])
-                    player_result.append("WINS")
+                    print("debug 209 if", item)
+                    result_list.append({"score": item["score"], "name": item["name"], "result": "WINS"})
                     winner_count += 1
                 else:
-                    score_list.append(item["score"])
-                    name_list.append(item["name"])
-                    player_result.append("LOSE")
+                    print("debug 213 else", item)
+                    result_list.append({"score": item["score"], "name": item["name"], "result": "LOSE"})
                     loser_count += 1
-
-            for score, name, z in zip(score_list, name_list, player_result):
-                result_list.append({"score": score, "name": name, "result": z})
 
         elif dealer_has_blackjack:
             print("debug: 217 dealer has blackjack")
@@ -292,7 +291,10 @@ class Game:
     def is_blackjack(self):
         """check if the cards are a blackjack"""
         total_value = 0
-        if len(self._current_player_card_set) == 2 or len(self._current_player_card_set) == 3:
+        if (
+            len(self._current_player_card_set) == 2
+            or len(self._current_player_card_set) == 3
+        ):
 
             for card in self._current_player_card_set:
                 if isinstance(card, str):  # could be better todo
@@ -347,19 +349,30 @@ class Game:
         if self._current_player_new_card.get_card_value == 11:
             ace_count += 1
 
-        if ace_count > 0 and self._current_player .get_score + self._current_player_new_card.get_card_value > 21:
+        if (
+            ace_count > 0
+            and self._current_player.get_score
+            + self._current_player_new_card.get_card_value
+            > 21
+        ):
             # problem is the new ace?
             if self._current_player_new_card.get_card_value == 11:
                 self._current_player_new_card.update_value(1)
 
-            if self._current_player .get_score + self._current_player_new_card.get_card_value > 21:
-                for card in self._current_player .cards:
+            if (
+                self._current_player.get_score
+                + self._current_player_new_card.get_card_value
+                > 21
+            ):
+                for card in self._current_player.cards:
                     if (
                         card.get_card_value == 11
-                        and self._current_player .get_score + self._current_player_new_card.get_card_value > 21
+                        and self._current_player.get_score
+                        + self._current_player_new_card.get_card_value
+                        > 21
                     ):  # there was already an ace on the players hand
                         card.update_value(1)
-                        self._current_player .update_player_score(-10)
+                        self._current_player.update_player_score(-10)
 
     def get_player_cards(self, *, a_player_name):
         player = self.get_player_by_name(a_player_name)
