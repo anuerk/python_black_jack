@@ -271,16 +271,14 @@ class Game:
 
         return result_list
 
-    @classmethod
-    def all_human_players_finished(cls, human_player_list):
+    def all_human_players_finished(self, human_player_list):
         for _ in human_player_list:
             if _.is_active and _.is_dealer is False:
                 return False
 
         return True
 
-    @classmethod
-    def is_blackjack(cls, card_set):
+    def is_blackjack(self, card_set):
         """check if the cards are a blackjack"""
         total_value = 0
         if len(card_set) == 2 or len(card_set) == 3:
@@ -300,8 +298,7 @@ class Game:
 
         return False
 
-    @classmethod
-    def print_result(cls, game_result):  # ide hint should be static? todo
+    def print_result(self, game_result):  # ide hint should be static? todo
         """gets a list with players: score, name, result
         and prints it
         """
@@ -324,8 +321,7 @@ class Game:
         print("|____________________________________________________________|")
         print("")
 
-    @classmethod
-    def check_ace_options(cls, xy_player, new_card):
+    def check_ace_options(self, xy_player, new_card):
         """checks player cards for possibility to reduce score"""
 
         new_card = new_card
