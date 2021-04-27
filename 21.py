@@ -13,3 +13,5 @@ black_jack = Game()
 # intitial - regel anzeigen? ja oder nein
 # 6 decks - 52 Blatt, also 312 Karten gespielt
 # split, double, insurance - https://www.bettingexpert.com/de/casino/blackjack/regeln
+# all players bust bet account does not substract
+# bet input only number
