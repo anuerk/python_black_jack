@@ -104,16 +104,19 @@ class Game:
         for a_player in self._players:
             if a_player.is_dealer is True:
                 new_card = self.user_wants_card(a_player)
-                print_string = "has picked the HOLE CARD and" + new_card.display_card
+                print(
+                    a_player.get_name,
+                    "has picked the HOLE CARD and",
+                    new_card.display_card,
+                )
             else:
                 new_card = self.user_wants_card(a_player)
-                print_string = "has picked"
 
-            print(
-                a_player.get_name,
-                print_string,
-                a_player.display_hand_cards(),
-            )
+                print(
+                    a_player.get_name,
+                    "has picked",
+                    a_player.display_hand_cards(),
+                )
 
         print("")
 
