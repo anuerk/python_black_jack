@@ -91,4 +91,4 @@ class Player:
 
     def set_bet_current_round(self, bet_amount):
         """updates the current bet"""
-        self._bet_current_round -= bet_amount
+        self._bet_current_round = bet_amount
