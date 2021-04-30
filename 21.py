@@ -9,8 +9,7 @@ black_jack = Game()
 # blackjack -> einsatz * 2.5
 # cheat_modus - kartenzählen (Anzeige: Anzahl der Karten im Deck)
 # 6 decks - 52 Blatt, also 312 Karten gespielt
-# split, double, insurance -
+# split, double, insurance
 # https://www.bettingexpert.com/de/casino/blackjack/regeln
 # prints only in game logic - not in other classes
-# game classe in round und classe unterrteilen
 # player um hand klasse erweitern/teilen (split)

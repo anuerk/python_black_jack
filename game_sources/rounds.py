@@ -296,3 +296,28 @@ class Round:
         )
 
         print("")
+
+    def is_blackjack(self):
+        """check if the cards are a blackjack
+        TODO currently not used :( but should
+        """
+        total_value = 0
+        if (
+            len(self._current_player_card_set) == 2
+            or len(self._current_player_card_set) == 3
+        ):
+
+            for card in self._current_player_card_set:
+                if isinstance(card, str):  # could be better todo
+                    tmp_card = card.split()
+                    card = Card(tmp_card[0], tmp_card[1], tmp_card[1])
+                total_value += card.get_card_value
+
+            if (
+                self._current_player_card_set[0].get_card_value == 7
+                and self._current_player_card_set[1].get_card_value == 7
+                and self._current_player_card_set[2].get_card_value == 7
+            ) or (total_value == 21 and len(self._current_player_card_set) == 2):
+                return True
+
+        return False
