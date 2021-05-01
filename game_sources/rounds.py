@@ -97,6 +97,7 @@ class Round:
         self.check_dealer_min_val()
         if self._players[0].get_score <= 21:
             if self._players[0].get_score > self._nearest_score:
+                print("debug dealer has nearest score alone")
                 self._nearest_score = self._players[0].get_score
         self._game_result = self.calculate_round_winner()
 
@@ -203,7 +204,7 @@ class Round:
 
     def calculate_round_winner(self):
         """
-        todo too many lists! too many everything! but it works :)
+        calculates who wins the round
         """
         player_results = []
         push_count = 0
@@ -219,25 +220,37 @@ class Round:
             else:
                 if dealer_busted:
                     player_results.append((player, "WINS", player.get_score))
-                    player.update_player_bet_rest(player.bet_current_round * -1)
+                    if self.is_blackjack(player.cards):
+                        player.update_player_bet_rest(player.bet_current_round * -1)
+                    else:
+                        player.update_player_bet_rest(player.bet_current_round * -1.5)
                 else:
                     if (
                         player.get_score == self._nearest_score
                         and self._players[0].get_score != self._nearest_score
-                    ):
+                    ):  # player wins and dealer not
                         player_results.append((player, "WINS", player.get_score))
-                        player.update_player_bet_rest(player.bet_current_round * -1)
+                        if self.is_blackjack(player.cards):
+                            player.update_player_bet_rest(player.bet_current_round * -1)
+                        else:
+                            player.update_player_bet_rest(
+                                player.bet_current_round * -1.5
+                            )
                     elif (
                         player.get_score == self._nearest_score
                         and self._players[0].get_score == self._nearest_score
-                    ):
+                    ):  # player and dealer win
                         player_results.append((player, "PUSH", player.get_score))
                         player.update_player_bet_rest(0)
                         push_count += 1
                     else:
+                        print("debug", player.get_score, player.get_name)
                         player_results.append((player, "LOSE", player.get_score))
                         player.update_player_bet_rest(player.bet_current_round)
 
+            print("self._nearest_score", self._nearest_score)
+            print("player.get_score", player.get_score)
+            print("player.get_name", player.get_name)
         if push_count == 1:
             # if dealer has the nearest score alone, he is the winner
             player_results.append((player_results[0][0], "WINS", player_results[0][2]))
@@ -297,27 +310,18 @@ class Round:
 
         print("")
 
-    def is_blackjack(self):
-        """check if the cards are a blackjack
-        TODO currently not used :( but should
-        """
+    @classmethod
+    def is_blackjack(cls, a_card_set):
+        """check if the cards are a blackjack"""
         total_value = 0
-        if (
-            len(self._current_player_card_set) == 2
-            or len(self._current_player_card_set) == 3
-        ):
+        for card in a_card_set:
+            total_value += card.get_card_value
 
-            for card in self._current_player_card_set:
-                if isinstance(card, str):  # could be better todo
-                    tmp_card = card.split()
-                    card = Card(tmp_card[0], tmp_card[1], tmp_card[1])
-                total_value += card.get_card_value
-
+        if len(a_card_set) == 2 or len(a_card_set) == 3:
             if (
-                self._current_player_card_set[0].get_card_value == 7
-                and self._current_player_card_set[1].get_card_value == 7
-                and self._current_player_card_set[2].get_card_value == 7
-            ) or (total_value == 21 and len(self._current_player_card_set) == 2):
+                a_card_set[0].get_card_value == 7
+                and a_card_set[1].get_card_value == 7
+                and a_card_set[2].get_card_value == 7
+            ) or (total_value == 21 and len(a_card_set) == 2):
                 return True
-
         return False

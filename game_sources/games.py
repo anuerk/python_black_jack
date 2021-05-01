@@ -1,5 +1,5 @@
 """This module does define the game logic. it uses players, decks, cards and the game class"""
-from game_sources import Player, Card, Round
+from game_sources import Player, Round
 
 
 class Game:
