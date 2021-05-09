@@ -42,7 +42,7 @@ class Round:
                 print(
                     a_player.get_name,
                     "has picked",
-                    a_player.display_hand_cards(),
+                    a_player.get_hand.display_hand_cards(),
                 )
 
         print("")
@@ -55,7 +55,7 @@ class Round:
                     print(
                         a_player.get_name,
                         " it is your turn. Current cards: ",
-                        a_player.display_hand_cards(),
+                        a_player.get_hand.display_hand_cards(),
                         sep="",
                     )
                     player_decision = input(
@@ -72,7 +72,7 @@ class Round:
                         # find optimal ace value for player
                         self.check_ace_options()
 
-                        a_player.take_card(self._current_player_new_card)
+                        a_player.get_hand.take_card(self._current_player_new_card)
 
                         print("")
                         print(
@@ -127,7 +127,7 @@ class Round:
     def user_wants_card(self, a_player):
         """takes a card from the deck and gives it to a given player"""
         new_card = self._cards.take_top_card_from_deck()
-        a_player.take_card(new_card)
+        a_player.get_hand.take_card(new_card)
         return new_card
 
     def check_ace_options(self):
@@ -137,7 +137,7 @@ class Round:
         current_player_aces = []
 
         # find optimal ace value for player
-        for current_player_card in self._current_player.cards:
+        for current_player_card in self._current_player.get_hand.cards:
             if "ACE" in current_player_card.get_card_string:
                 ace_count += 1
                 current_player_aces.append(current_player_card)
@@ -160,7 +160,7 @@ class Round:
                 + self._current_player_new_card.get_card_value
                 > 21
             ):
-                for card in self._current_player.cards:
+                for card in self._current_player.get_hand.cards:
                     if (
                         card.get_card_value == 11
                         and self._current_player.get_score
@@ -196,7 +196,7 @@ class Round:
         self._current_player = self._players[0]
         while self._players[0].get_score < 17:
             self._current_player_new_card = self._cards.take_top_card_from_deck()
-            self._players[0].take_card(self._current_player_new_card)
+            self._players[0].get_hand.take_card(self._current_player_new_card)
             print("Dealer picked new card:", self._current_player_new_card.display_card)
 
             if self._players[0].get_score > 21:
@@ -220,7 +220,7 @@ class Round:
             else:
                 if dealer_busted:
                     player_results.append((player, "WINS", player.get_score))
-                    if self.is_blackjack(player.cards):
+                    if self.is_blackjack(player.get_hand.cards):
                         player.update_player_bet_rest(player.bet_current_round * -1)
                     else:
                         player.update_player_bet_rest(player.bet_current_round * -1.5)
@@ -230,7 +230,7 @@ class Round:
                         and self._players[0].get_score != self._nearest_score
                     ):  # player wins and dealer not
                         player_results.append((player, "WINS", player.get_score))
-                        if self.is_blackjack(player.cards):
+                        if self.is_blackjack(player.get_hand.cards):
                             player.update_player_bet_rest(player.bet_current_round * -1)
                         else:
                             player.update_player_bet_rest(
