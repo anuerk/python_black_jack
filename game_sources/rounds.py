@@ -52,36 +52,37 @@ class Round:
             for a_player in self._players:
                 self._current_player = a_player
                 if a_player.is_active and a_player.is_dealer is False:  # human-player
-                    print(
-                        a_player.get_name,
-                        " it is your turn. Current cards: ",
-                        a_player.get_hand.display_hand_cards(),
-                        sep="",
-                    )
-                    player_decision = input(
-                        "Do you want a new card? (yes or no) "
-                    ).lower()
-                    # currently only Stand or hit
-                    if player_decision in ("no", "n"):
-                        a_player.set_player_mode(False)
-                    elif player_decision in ("yes", "y"):
-                        self._current_player_new_card = (
-                            self._cards.take_top_card_from_deck()
-                        )
-
-                        # find optimal ace value for player
-                        self.check_ace_options()
-
-                        a_player.get_hand.take_card(self._current_player_new_card)
-
-                        print("")
+                    while a_player.is_active:
                         print(
-                            "you have picked",
-                            self._current_player_new_card.display_card,
+                            a_player.get_name,
+                            " it is your turn. Current cards: ",
+                            a_player.get_hand.display_hand_cards(),
+                            sep="",
                         )
+                        player_decision = input(
+                            "Do you want a new card? (yes or no) "
+                        ).lower()
+                        # currently only Stand or hit
+                        if player_decision in ("no", "n"):
+                            a_player.set_player_mode(False)
+                        elif player_decision in ("yes", "y"):
+                            self._current_player_new_card = (
+                                self._cards.take_top_card_from_deck()
+                            )
 
-                        self.check_busted_player(a_player)
-                    print("")
+                            # find optimal ace value for player
+                            self.check_ace_options()
+
+                            a_player.get_hand.take_card(self._current_player_new_card)
+
+                            print("")
+                            print(
+                                "you have picked",
+                                self._current_player_new_card.display_card,
+                            )
+
+                            self.check_busted_player(a_player)
+                        print("")
 
                     if a_player.get_score <= 21:
                         if a_player.get_score > self._nearest_score:
@@ -248,9 +249,9 @@ class Round:
                         player_results.append((player, "LOSE", player.get_score))
                         player.update_player_bet_rest(player.bet_current_round)
 
-            print("self._nearest_score", self._nearest_score)
-            print("player.get_score", player.get_score)
-            print("player.get_name", player.get_name)
+            #print("self._nearest_score", self._nearest_score)
+            #print("player.get_score", player.get_score)
+            #print("player.get_name", player.get_name)
         if push_count == 1:
             # if dealer has the nearest score alone, he is the winner
             player_results.append((player_results[0][0], "WINS", player_results[0][2]))
@@ -290,7 +291,7 @@ class Round:
                     "|   ",
                     "{0: <5}".format(player[1]),
                     "|   ",
-                    "{0: <5}".format(player[0].bet_available),
+                    "{0: <5}".format(int(player[0].bet_available)),
                     "     |",
                 )
             else:
