@@ -16,7 +16,7 @@ class Round:
         print("")
 
         # create card deck and mix
-        self._cards = Deck(card_count_total=52)
+        self._cards = Deck(deck_count=6)
         self._cards.mix_deck()
 
         # first card for all players - public
