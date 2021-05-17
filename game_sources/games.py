@@ -7,6 +7,7 @@ class Game:
 
     def __init__(self):
         """Create a new game.  """
+        self._nearest_score = 0
         self._cards = None  # the cards in the game
         self._players = []  # a list of players
         self._game_result = None  # result of the round
@@ -75,7 +76,6 @@ class Game:
         self._current_player_card_set = None
         self._current_player_new_card = None
         self._current_player = None
-        self._nearest_score = 0
 
         # reset player properties
         for a_player in self._players:

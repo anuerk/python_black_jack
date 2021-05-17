@@ -9,11 +9,10 @@ class Round:
     def __init__(self, players, cards):
         """start a round for the black jack game"""
 
+        print("")
         self._players = players
         self._cards = cards
         self._nearest_score = 0
-
-        print("")
 
         # create card deck and mix
         self._cards = Deck(deck_count=6)
@@ -42,59 +41,106 @@ class Round:
                 print(
                     a_player.get_name,
                     "has picked",
-                    a_player.get_hand.display_hand_cards(),
+                    a_player.get_hand[0].display_hand_cards(),
                 )
 
         print("")
 
         for a_player in self._players:
             self._current_player = a_player
-            if a_player.is_active and a_player.is_dealer is False:  # human-player
-                while a_player.is_active:
-                    print(
-                        a_player.get_name,
-                        " it is your turn. Current cards: ",
-                        a_player.get_hand.display_hand_cards(),
-                        sep="",
-                    )
-                    player_decision = input(
-                        "Do you want a new card? (yes or no) "
-                    ).lower()
-                    # currently only Stand or hit
-                    if player_decision in ("no", "n"):
-                        a_player.set_player_mode(False)
-                    elif player_decision in ("yes", "y"):
-                        self._current_player_new_card = (
-                            self._cards.take_top_card_from_deck()
+            for deck_counter, hand in enumerate(a_player.get_hand):
+                if hand.is_active and a_player.is_dealer is False:  # human-player
+                    while hand.is_active:
+                        print(
+                            a_player.get_name,
+                            " it is your turn. Current cards: ",
+                            hand.display_hand_cards(),
+                            sep="",
                         )
+                        player_decision = input(
+                            "What now? stand, hit, split, double, ..."
+                        ).lower()
 
-                        # find optimal ace value for player
-                        self.check_ace_options()
+                        if player_decision == "stand":
+                            hand.set_hand_mode(False)
+                        elif player_decision == "hit":
+                            self._current_player_new_card = (
+                                self._cards.take_top_card_from_deck()
+                            )
 
-                        a_player.get_hand.take_card(self._current_player_new_card)
+                            # find optimal ace value for player
+                            self.check_ace_options(hand)
+
+                            a_player.get_hand[deck_counter].take_card(
+                                self._current_player_new_card
+                            )
+
+                            print(
+                                "\nyou have picked",
+                                self._current_player_new_card.display_card,
+                            )
+
+                            self.check_busted_hand(hand)
+                        elif player_decision == "split":
+                            if hand.cards_are_equal():
+                                a_player.spilt_hand()
+                            else:
+                                print("you need to have two cards with the same value. 3 cards are too much")
+                        elif player_decision == "double":
+                            a_player.set_bet_current_round(
+                                a_player.bet_current_round * 2
+                            )
+                            double_decision = input(
+                                "doubled your bet :) also a new card?"
+                            ).lower()
+                            if double_decision == "yes" or double_decision == "y":
+                                self._current_player_new_card = (
+                                    self._cards.take_top_card_from_deck()
+                                )
+
+                                # find optimal ace value for player
+                                self.check_ace_options(hand)
+
+                                a_player.get_hand[deck_counter].take_card(
+                                    self._current_player_new_card
+                                )
+
+                                print(
+                                    "\nyou have picked",
+                                    self._current_player_new_card.display_card,
+                                )
+                            hand.set_hand_mode(False)
+
+                        elif player_decision == "insurance":
+                            hand.set_insurance(True)
+                            hand.set_bet_current_round(hand.bet_current_round / 2)
+
+                            if hole_card.get_card_string == "ACE":
+                                ...
+                            else:
+                                ...
+
+                            """todo Versicherung (Insurance): Sollte die erste Karte des Dealers ein Ass sein, kann 
+                            Der Dealer wird seine Hole-Karte  überprüfen, bevor die
+                              Spieler an der Reihe sind. Ist die zweite Karte des Dealers nun eine Zehn oder Bildkarte, 
+                              hat er tatsächlich einen Blackjack und die Versicherung wird im Verhältnis 2:1 an den 
+                              Spieler ausgezahlt. Hat der Dealer keinen Blackjack, geht der Versicherungsbetrag an die
+                               Bank und das Spiel geht normal weiter, ohne dass der Dealer seine zweite Karte vorzeitig 
+                               aufdeckt."""
 
                         print("")
-                        print(
-                            "you have picked",
-                            self._current_player_new_card.display_card,
-                        )
 
-                        self.check_busted_player(a_player)
-                    print("")
+                    if hand.get_score <= 21:
+                        if hand.get_score > self._nearest_score:
+                            self._nearest_score = hand.get_score
 
-                if a_player.get_score <= 21:
-                    if a_player.get_score > self._nearest_score:
-                        self._nearest_score = a_player.get_score
-
-        print("")
-        print("Dealer Hole card:", hole_card.display_card)
+        print("Round over - hole card is", hole_card)
 
         # dealer must have at least a score of 17
         self.check_dealer_min_val()
-        if self._players[0].get_score <= 21:
-            if self._players[0].get_score > self._nearest_score:
-                print("debug dealer has nearest score alone")
-                self._nearest_score = self._players[0].get_score
+        if self._players[0].get_hand[0].get_score <= 21:
+            if self._players[0].get_hand[0].get_score > self._nearest_score:
+                self._nearest_score = self._players[0].get_hand[0].get_score
         self._game_result = self.calculate_round_winner()
 
         self.print_result()
@@ -123,17 +169,17 @@ class Round:
     def user_wants_card(self, a_player):
         """takes a card from the deck and gives it to a given player"""
         new_card = self._cards.take_top_card_from_deck()
-        a_player.get_hand.take_card(new_card)
+        a_player.get_hand[0].take_card(new_card)
         return new_card
 
-    def check_ace_options(self):
+    def check_ace_options(self, hand):
         """checks player cards for possibility to reduce score"""
 
         ace_count = 0
         current_player_aces = []
 
         # find optimal ace value for player
-        for current_player_card in self._current_player.get_hand.cards:
+        for current_player_card in hand.cards:
             if "ACE" in current_player_card.get_card_string:
                 ace_count += 1
                 current_player_aces.append(current_player_card)
@@ -143,52 +189,46 @@ class Round:
 
         if (
             ace_count > 0
-            and self._current_player.get_score
-            + self._current_player_new_card.get_card_value
-            > 21
+            and hand.get_score + self._current_player_new_card.get_card_value > 21
         ):
             # problem is the new ace?
             if self._current_player_new_card.get_card_value == 11:
                 self._current_player_new_card.update_value(1)
 
-            if (
-                self._current_player.get_score
-                + self._current_player_new_card.get_card_value
-                > 21
-            ):
-                for card in self._current_player.get_hand.cards:
+            if hand.get_score + self._current_player_new_card.get_card_value > 21:
+                for card in hand.cards:
                     if (
                         card.get_card_value == 11
-                        and self._current_player.get_score
+                        and hand.get_score
                         + self._current_player_new_card.get_card_value
                         > 21
                     ):  # there was already an ace on the players hand
                         card.update_value(1)
-                        self._current_player.update_player_score(-10)
+                        hand.update_hand_score(-10)
 
     @classmethod
-    def check_busted_player(cls, a_player):
+    def check_busted_hand(cls, a_hand):
         """checks if a players score is above 21
         returns True OR False
         """
-        if a_player.get_score > 21:  # already lost?
-            a_player.set_player_mode(False)
+        if a_hand.get_score > 21:  # already lost?
+            a_hand.set_hand_mode(False)
             print("BUST - over 21")
         else:
-            a_player.set_player_mode(True)
+            a_hand.set_hand_mode(True)
 
     def check_dealer_min_val(self):
         """dealer must have at least a score of 17.
         it (we are gender neutral ;)) has to take new card until he reaches a score of 17
         """
         self._current_player = self._players[0]
-        while self._players[0].get_score < 17:
+        while self._players[0].get_hand[0].get_score < 17:
             self._current_player_new_card = self._cards.take_top_card_from_deck()
-            self._players[0].get_hand.take_card(self._current_player_new_card)
+            self._players[0].get_hand[0].take_card(self._current_player_new_card)
             print("Dealer picked new card:", self._current_player_new_card.display_card)
 
-            if self._players[0].get_score > 21:
-                self.check_ace_options()
+            if self._players[0].get_hand[0].get_score > 21:
+                self.check_ace_options(self._players[0].get_hand[0])
 
     def calculate_round_winner(self):
         """
@@ -199,42 +239,48 @@ class Round:
         dealer_busted = False
 
         for player in self._players:
-            # filter busted players first
-            if player.get_score > 21:
-                if player.get_name == "Dealer":
-                    dealer_busted = True
-                player_results.append((player, "LOSE", player.get_score))
-                player.update_player_bet_rest(player.bet_current_round)
-            else:
-                if dealer_busted:
-                    player_results.append((player, "WINS", player.get_score))
-                    if self.is_blackjack(player.get_hand.cards):
-                        player.update_player_bet_rest(player.bet_current_round * -1)
-                    else:
-                        player.update_player_bet_rest(player.bet_current_round * -1.5)
+            for hand in player.get_hand:
+                # filter busted players first
+                if hand.get_score > 21:
+                    if player.get_name == "Dealer":
+                        dealer_busted = True
+                    player_results.append((player, "LOSE", hand.get_score))
+                    player.update_player_bet_rest(player.bet_current_round)
                 else:
-                    if (
-                        player.get_score == self._nearest_score
-                        and self._players[0].get_score != self._nearest_score
-                    ):  # player wins and dealer not
-                        player_results.append((player, "WINS", player.get_score))
-                        if self.is_blackjack(player.get_hand.cards):
+                    if dealer_busted:
+                        player_results.append((player, "WINS", hand.get_score))
+                        if self.is_blackjack(player.get_hand[0].cards):
                             player.update_player_bet_rest(player.bet_current_round * -1)
                         else:
                             player.update_player_bet_rest(
                                 player.bet_current_round * -1.5
                             )
-                    elif (
-                        player.get_score == self._nearest_score
-                        and self._players[0].get_score == self._nearest_score
-                    ):  # player and dealer win
-                        player_results.append((player, "PUSH", player.get_score))
-                        player.update_player_bet_rest(0)
-                        push_count += 1
                     else:
-                        print("debug", player.get_score, player.get_name)
-                        player_results.append((player, "LOSE", player.get_score))
-                        player.update_player_bet_rest(player.bet_current_round)
+                        if (
+                            hand.get_score == self._nearest_score
+                            and self._players[0].get_hand[0].get_score
+                            != self._nearest_score
+                        ):  # player wins and dealer not
+                            player_results.append((player, "WINS", hand.get_score))
+                            if self.is_blackjack(player.get_hand[0].cards):
+                                player.update_player_bet_rest(
+                                    player.bet_current_round * -1
+                                )
+                            else:
+                                player.update_player_bet_rest(
+                                    player.bet_current_round * -1.5
+                                )
+                        elif (
+                            hand.get_score == self._nearest_score
+                            and self._players[0].get_hand[0].get_score
+                            == self._nearest_score
+                        ):  # player and dealer win
+                            player_results.append((player, "PUSH", hand.get_score))
+                            player.update_player_bet_rest(0)
+                            push_count += 1
+                        else:
+                            player_results.append((player, "LOSE", hand.get_score))
+                            player.update_player_bet_rest(player.bet_current_round)
 
         if push_count == 1:
             # if dealer has the nearest score alone, he is the winner

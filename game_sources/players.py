@@ -7,8 +7,6 @@ class Player:
     """A blueprint for a game card player"""
 
     def __init__(self, name, *, dealer=False):
-        self._active = True  #
-        self._score = 0
         self._dealer = dealer
 
         if dealer:
@@ -20,7 +18,8 @@ class Player:
             self._bet_current_round = 0
             self._name = name
 
-        self._hand = Hand(self)
+        self._hand = []
+        self._hand.append(Hand(self))
 
     def __repr__(self):
         """Text representation."""
@@ -43,11 +42,6 @@ class Player:
         return self._hand
 
     @property
-    def is_active(self):
-        """defines if the player is finished"""
-        return self._active
-
-    @property
     def is_dealer(self):
         """checks if a given player is a dealer"""
         return self._dealer
@@ -58,28 +52,14 @@ class Player:
         return self._name
 
     @property
-    def get_score(self):
-        """returns the current player round score"""
-        return self._score
-
-    @property
     def get_hand(self):
         """returns the card hand of a player"""
         return self._hand
 
-    def set_player_mode(self, active):
-        """updates the player if he does want more cards"""
-        self._active = active
-
-    def update_player_score(self, update_value):
-        """updates the current player score of his cards"""
-        self._score += update_value
-
     def reset_round(self):
         """reset the players properties for the current round"""
-        self._hand = Hand(self)
-        self._active = True
-        self._score = 0
+        self._hand = []
+        self._hand.append(Hand(self))
 
     def update_player_bet_rest(self, number):
         """updates the players game bet amount with the round result"""
@@ -88,3 +68,19 @@ class Player:
     def set_bet_current_round(self, bet_amount):
         """updates the current bet"""
         self._bet_current_round = bet_amount
+
+    def spilt_hand(self):
+        """splits the players hand to two hands"""
+        # add a new hand with one card from the other hand
+
+        self.update_player_bet_rest(self.bet_current_round * 2)
+
+        self._hand.append(Hand(self))
+        self._hand[1].cards.append(self._hand[0].cards[0])
+
+        # also split the score
+        self._hand[0].update_hand_score(self._hand[0].cards[0].get_card_value / 2)
+        self._hand[1].update_hand_score(self._hand[0].cards[0].get_card_value / 2)
+
+        # and remove the card from the other hand
+        del self._hand[0].cards[0]

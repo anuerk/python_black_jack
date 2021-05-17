@@ -5,7 +5,7 @@ from game_sources import Game
 black_jack = Game()
 
 # Todo:
-# split, double, insurance
+# split, insurance
 # https://www.bettingexpert.com/de/casino/blackjack/regeln
 # prints only in game logic - not in other classes
 # args and returns in methods
