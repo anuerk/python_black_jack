@@ -6,12 +6,11 @@ from game_sources import Deck
 class Round:
     """defines the logic for the black jack round"""
 
-    def __init__(self, players, cards):
+    def __init__(self, players):
         """start a round for the black jack game"""
 
         print("")
         self._players = players
-        self._cards = cards
         self._nearest_score = 0
 
         # create card deck and mix
@@ -19,12 +18,7 @@ class Round:
         self._cards.mix_deck()
 
         # first card for all players - public
-        for a_player in self._players:
-            if a_player.is_dealer is not True:
-                self.give_bet(a_player)
-                self.user_wants_card(a_player)
-            else:
-                hole_card = self.user_wants_card(a_player)
+        self.first_cards_for_players()
 
         # second card for all players - public
         for a_player in self._players:
@@ -48,93 +42,16 @@ class Round:
 
         for a_player in self._players:
             self._current_player = a_player
-            for deck_counter, hand in enumerate(a_player.get_hand):
+            for hand_index, hand in enumerate(a_player.get_hand):
+                self._current_hand = hand
                 if hand.is_active and a_player.is_dealer is False:  # human-player
                     while hand.is_active:
-                        print(
-                            a_player.get_name,
-                            " it is your turn. Current cards: ",
-                            hand.display_hand_cards(),
-                            sep="",
-                        )
-                        player_decision = input(
-                            "What now? stand, hit, split, double, ..."
-                        ).lower()
+                        self.human_player_turn(hand_index)
 
-                        if player_decision == "stand":
-                            hand.set_hand_mode(False)
-                        elif player_decision == "hit":
-                            self._current_player_new_card = (
-                                self._cards.take_top_card_from_deck()
-                            )
+                    if 21 >= hand.get_score > self._nearest_score:
+                        self._nearest_score = hand.get_score
 
-                            # find optimal ace value for player
-                            self.check_ace_options(hand)
-
-                            a_player.get_hand[deck_counter].take_card(
-                                self._current_player_new_card
-                            )
-
-                            print(
-                                "\nyou have picked",
-                                self._current_player_new_card.display_card,
-                            )
-
-                            self.check_busted_hand(hand)
-                        elif player_decision == "split":
-                            if hand.cards_are_equal():
-                                a_player.spilt_hand()
-                            else:
-                                print("you need to have two cards with the same value. 3 cards are too much")
-                        elif player_decision == "double":
-                            a_player.set_bet_current_round(
-                                a_player.bet_current_round * 2
-                            )
-                            double_decision = input(
-                                "doubled your bet :) also a new card?"
-                            ).lower()
-                            if double_decision == "yes" or double_decision == "y":
-                                self._current_player_new_card = (
-                                    self._cards.take_top_card_from_deck()
-                                )
-
-                                # find optimal ace value for player
-                                self.check_ace_options(hand)
-
-                                a_player.get_hand[deck_counter].take_card(
-                                    self._current_player_new_card
-                                )
-
-                                print(
-                                    "\nyou have picked",
-                                    self._current_player_new_card.display_card,
-                                )
-                            hand.set_hand_mode(False)
-
-                        elif player_decision == "insurance":
-                            hand.set_insurance(True)
-                            hand.set_bet_current_round(hand.bet_current_round / 2)
-
-                            if hole_card.get_card_string == "ACE":
-                                ...
-                            else:
-                                ...
-
-                            """todo Versicherung (Insurance): Sollte die erste Karte des Dealers ein Ass sein, kann 
-                            Der Dealer wird seine Hole-Karte  überprüfen, bevor die
-                              Spieler an der Reihe sind. Ist die zweite Karte des Dealers nun eine Zehn oder Bildkarte, 
-                              hat er tatsächlich einen Blackjack und die Versicherung wird im Verhältnis 2:1 an den 
-                              Spieler ausgezahlt. Hat der Dealer keinen Blackjack, geht der Versicherungsbetrag an die
-                               Bank und das Spiel geht normal weiter, ohne dass der Dealer seine zweite Karte vorzeitig 
-                               aufdeckt."""
-
-                        print("")
-
-                    if hand.get_score <= 21:
-                        if hand.get_score > self._nearest_score:
-                            self._nearest_score = hand.get_score
-
-        print("Round over - hole card is", hole_card)
+        print("Round over - hole card is", self._players[0].get_hand[0].cards[0].display_card)
 
         # dealer must have at least a score of 17
         self.check_dealer_min_val()
@@ -152,7 +69,7 @@ class Round:
         players_bet = 0
         while incorrect_human_input:
             try:
-                players_bet = int(
+                players_bet = float(
                     input(
                         a_player.get_name
                         + " it is your turn. still available: "
@@ -168,6 +85,7 @@ class Round:
 
     def user_wants_card(self, a_player):
         """takes a card from the deck and gives it to a given player"""
+
         new_card = self._cards.take_top_card_from_deck()
         a_player.get_hand[0].take_card(new_card)
         return new_card
@@ -206,16 +124,15 @@ class Round:
                         card.update_value(1)
                         hand.update_hand_score(-10)
 
-    @classmethod
-    def check_busted_hand(cls, a_hand):
+    def check_busted_hand(self):
         """checks if a players score is above 21
         returns True OR False
         """
-        if a_hand.get_score > 21:  # already lost?
-            a_hand.set_hand_mode(False)
+        if self._current_hand.get_score > 21:  # already lost?
+            self._current_hand.set_hand_mode(False)
             print("BUST - over 21")
         else:
-            a_hand.set_hand_mode(True)
+            self._current_hand.set_hand_mode(True)
 
     def check_dealer_min_val(self):
         """dealer must have at least a score of 17.
@@ -317,7 +234,7 @@ class Round:
                     "|  ",
                     "{0: <27}".format(player[0].get_name),
                     "|   ",
-                    "{0: <8}".format(player[2]),
+                    "{0: <8}".format(int(player[2])),
                     "|   ",
                     "{0: <5}".format(player[1]),
                     "|   ",
@@ -356,3 +273,80 @@ class Round:
             ) or (total_value == 21 and len(a_card_set) == 2):
                 return True
         return False
+
+    def human_player_turn(self, hand_index):
+        """todo"""
+        print(
+            self._current_player.get_name,
+            " it is your turn. Current cards: ",
+            self._current_player.get_hand[hand_index].display_hand_cards(),
+            sep="",
+        )
+        player_decision = input(
+            "What now? stand, hit, split, double, ..."
+        ).lower()
+
+        if player_decision == "stand":
+            self._current_player.get_hand[hand_index].set_hand_mode(False)
+        elif player_decision == "hit":
+            self._current_player_new_card = (
+                self._cards.take_top_card_from_deck()
+            )
+
+            # find optimal ace value for player
+            self.check_ace_options(self._current_player.get_hand[hand_index])
+
+            self._current_player.get_hand[hand_index].take_card(
+                self._current_player_new_card
+            )
+
+            print(
+                "\nyou have picked",
+                self._current_player_new_card.display_card,
+            )
+
+            self.check_busted_hand()
+        elif player_decision == "split":
+            if self._current_player.get_hand[hand_index].split_is_possible():
+                self._current_player.spilt_hand()
+            else:
+                print("you must have two cards with the same value")
+        elif player_decision == "double":
+            self._current_player.set_bet_current_round(
+                self._current_player.bet_current_round * 2
+            )
+            double_decision = input(
+                "doubled your bet :) also a new card?"
+            ).lower()
+            if double_decision in ('yes', 'y'):
+                self._current_player_new_card = (
+                    self._cards.take_top_card_from_deck()
+                )
+
+                # find optimal ace value for player
+                self.check_ace_options(self._current_player.get_hand[hand_index])
+
+                self._current_player.get_hand[hand_index].take_card(
+                    self._current_player_new_card
+                )
+
+                print(
+                    "\nyou have picked",
+                    self._current_player_new_card.display_card,
+                )
+            self._current_hand.set_hand_mode(False)
+
+        elif player_decision == "insurance":
+            print("sorry, not implemented yet")
+            # todo https://www.bettingexpert.com/de/casino/blackjack/regeln
+
+        print("")
+
+    def first_cards_for_players(self):
+        """gives first cards for players and dealer"""
+        for a_player in self._players:
+            if a_player.is_dealer is not True:
+                self.give_bet(a_player)
+                self.user_wants_card(a_player)
+            else:
+                self.user_wants_card(a_player)

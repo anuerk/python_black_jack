@@ -36,6 +36,7 @@ class Hand:
         self._active = active
 
     def set_insurance(self, param):
+        """marker for insurance move from player"""
         self._insurance = param
 
     @property
@@ -54,7 +55,7 @@ class Hand:
             card_list.append(card.display_card)
         return card_list
 
-    def cards_are_equal(self):
+    def split_is_possible(self):
         """check if the cards of the players are equal. needed for split"""
         if (
             self._cards[0].get_card_value == self._cards[1].get_card_value

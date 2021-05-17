@@ -7,13 +7,7 @@ class Game:
 
     def __init__(self):
         """Create a new game.  """
-        self._nearest_score = 0
-        self._cards = None  # the cards in the game
         self._players = []  # a list of players
-        self._game_result = None  # result of the round
-        self._current_player_card_set = []  #
-        self._current_player_new_card = None
-        self._current_player = None
 
         initial_game = True
         game = True
@@ -25,7 +19,7 @@ class Game:
                 self.reset_round_result()
 
             # general game loop
-            Round(self._players, self._cards)
+            Round(self._players)
 
             y_or_n = input("Game over - new round? (yes or no)")
             if y_or_n in ("no", "n"):
@@ -71,13 +65,6 @@ class Game:
 
     def reset_round_result(self):
         """resets all round properties of the game"""
-        self._cards = None
-        self._game_result = None
-        self._current_player_card_set = None
-        self._current_player_new_card = None
-        self._current_player = None
-
-        # reset player properties
         for a_player in self._players:
             a_player.reset_round()
 
@@ -85,15 +72,6 @@ class Game:
     def players(self):
         """returns the current game players"""
         return self._players
-
-    def get_player_by_name(self, name):
-        """gets a players name an returns the player object"""
-
-        for player in self._players:
-            if player.get_name == name:
-                return player
-
-        return None
 
     def define_player(self):
         """sets the game players - dealer inclusive"""

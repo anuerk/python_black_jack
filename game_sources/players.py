@@ -72,15 +72,17 @@ class Player:
     def spilt_hand(self):
         """splits the players hand to two hands"""
         # add a new hand with one card from the other hand
-
+        print("Debug split hand")
         self.update_player_bet_rest(self.bet_current_round * 2)
 
         self._hand.append(Hand(self))
         self._hand[1].cards.append(self._hand[0].cards[0])
 
         # also split the score
-        self._hand[0].update_hand_score(self._hand[0].cards[0].get_card_value / 2)
-        self._hand[1].update_hand_score(self._hand[0].cards[0].get_card_value / 2)
+        print("debug split habliert den wert auf der hand")
+        score_from_old_hand = self._hand[0].get_score / 2
+        self._hand[0].update_hand_score(-1 * score_from_old_hand)
+        self._hand[1].update_hand_score(score_from_old_hand)
 
         # and remove the card from the other hand
         del self._hand[0].cards[0]
