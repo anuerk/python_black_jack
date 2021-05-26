@@ -14,7 +14,6 @@ class Deck:
                 for _ in range(2, 15):
                     if _ == 11:
                         card_string = "JACK"
-                        Card("HEART", card_string, card_int)
                         card_int = 10
                     elif _ == 12:
                         card_string = "QUEEN"
