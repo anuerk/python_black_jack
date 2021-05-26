@@ -32,12 +32,12 @@ class Hand:
         return self._active
 
     def set_hand_mode(self, active):
-        """updates the player if he does want more cards"""
-        self._active = active
+        """updates the player if he does want more cards
 
-    def set_insurance(self, param):
-        """marker for insurance move from player"""
-        self._insurance = param
+        Args:
+            active: boolean
+        """
+        self._active = active
 
     @property
     def get_score(self):
@@ -45,7 +45,11 @@ class Hand:
         return self._score
 
     def update_hand_score(self, update_value):
-        """updates the current player score of his cards"""
+        """updates the current player score of his cards
+
+        Args:
+            update_value: number (the new value)
+        """
         self._score += update_value
 
     def display_hand_cards(self):

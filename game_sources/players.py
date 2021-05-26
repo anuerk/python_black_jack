@@ -22,11 +22,6 @@ class Player:
         self._hand.append(Hand(self))
 
     def __repr__(self):
-        """Text representation."""
-        name = self.__class__.__name__
-        return f"{name} ({self._name}, {self._hand})"
-
-    def __repr__(self):
         """Text representation"""
         name = self.__class__.__name__
         args = repr(self._name) + repr(self._name) + repr(self._dealer)
@@ -68,11 +63,19 @@ class Player:
         self._hand.append(Hand(self))
 
     def update_player_bet_rest(self, number):
-        """updates the players game bet amount with the round result"""
+        """updates the players game bet amount with the round result
+
+        Args:
+            number: number
+        """
         self._bet_available -= number
 
     def set_bet_current_round(self, bet_amount):
-        """updates the current bet"""
+        """updates the current bet
+
+        Args:
+            bet_amount: number (bet amount of a player in the current round)
+        """
         self._bet_current_round = bet_amount
 
     def spilt_hand(self):

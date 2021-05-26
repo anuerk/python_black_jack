@@ -7,7 +7,11 @@ class Round:
     """defines the logic for the black jack round"""
 
     def __init__(self, players):
-        """start a round for the black jack game"""
+        """start a round for the black jack game
+
+        Args:
+            players: a sequence of players
+        """
 
         print("")
         self._players = players
@@ -64,7 +68,11 @@ class Round:
 
     @classmethod
     def give_bet(cls, a_player):
-        """displays player score inputs players bet amount"""
+        """displays player score inputs players bet amount
+
+        Args:
+            a_player: player (the player giving a bet)
+        """
         incorrect_human_input = True
         players_bet = 0
         while incorrect_human_input:
@@ -260,7 +268,11 @@ class Round:
 
     @classmethod
     def is_blackjack(cls, a_card_set):
-        """check if the cards are a blackjack"""
+        """check if the cards are a blackjack
+
+        Args:
+            a_card_set: hand
+        """
         total_value = 0
         for card in a_card_set:
             total_value += card.get_card_value
