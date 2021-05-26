@@ -7,31 +7,34 @@ from game_sources.cards import Card
 class Deck:
     """A blueprint for a game card deck"""
 
-    def __init__(self, *, deck_count=1):
+    def __init__(self, cards, *, deck_count=1):
         self._cards = []
+        if len(cards) == 0:
+            for _ in range(0, deck_count):
+                for _ in range(2, 15):
+                    if _ == 11:
+                        card_string = "JACK"
+                        Card("HEART", card_string, card_int)
+                        card_int = 10
+                    elif _ == 12:
+                        card_string = "QUEEN"
+                        card_int = 10
+                    elif _ == 13:
+                        card_string = "KING"
+                        card_int = 10
+                    elif _ == 14:
+                        card_string = "ACE"
+                        card_int = 11
+                    else:
+                        card_int = _
+                        card_string = str(_)
 
-        for _ in range(0, deck_count):
-            for _ in range(2, 15):
-                if _ == 11:
-                    card_string = "JACK"
-                    card_int = 10
-                elif _ == 12:
-                    card_string = "QUEEN"
-                    card_int = 10
-                elif _ == 13:
-                    card_string = "KING"
-                    card_int = 10
-                elif _ == 14:
-                    card_string = "ACE"
-                    card_int = 11
-                else:
-                    card_int = _
-                    card_string = str(_)
-
-                self._cards.append(Card("HEART", card_string, card_int))
-                self._cards.append(Card("TILE", card_string, card_int))
-                self._cards.append(Card("PIKE", card_string, card_int))
-                self._cards.append(Card("CLOVER", card_string, card_int))
+                    self._cards.append(Card("HEART", card_string, card_int))
+                    self._cards.append(Card("TILE", card_string, card_int))
+                    self._cards.append(Card("PIKE", card_string, card_int))
+                    self._cards.append(Card("CLOVER", card_string, card_int))
+        else:
+            self._cards = cards
 
     def __len__(self):
         return len(self._cards)
@@ -42,6 +45,12 @@ class Deck:
         except IndexError:
             n_cards = len(self)
             raise IndexError(f"the deck has only {n_cards} cards") from None
+
+    def __repr__(self):
+        """Text representation"""
+        name = self.__class__.__name__
+        args = repr(self._cards)
+        return f"{name}({args})"
 
     def mix_deck(self):
         """mixes a given card deck"""

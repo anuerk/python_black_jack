@@ -14,7 +14,7 @@ class Round:
         self._nearest_score = 0
 
         # create card deck and mix
-        self._cards = Deck(deck_count=6)
+        self._cards = Deck([], deck_count=6)
         self._cards.mix_deck()
 
         # first card for all players - public
@@ -151,7 +151,7 @@ class Round:
         """
         calculates who wins the round
         """
-        player_results = []
+        result = []
         push_count = 0
         dealer_busted = False
 
@@ -161,11 +161,11 @@ class Round:
                 if hand.get_score > 21:
                     if player.get_name == "Dealer":
                         dealer_busted = True
-                    player_results.append((player, "LOSE", hand.get_score))
+                    result.append((player, "LOSE", hand.get_score))
                     player.update_player_bet_rest(player.bet_current_round)
                 else:
                     if dealer_busted:
-                        player_results.append((player, "WINS", hand.get_score))
+                        result.append((player, "WINS", hand.get_score))
                         if self.is_blackjack(player.get_hand[0].cards):
                             player.update_player_bet_rest(player.bet_current_round * -1)
                         else:
@@ -178,7 +178,7 @@ class Round:
                             and self._players[0].get_hand[0].get_score
                             != self._nearest_score
                         ):  # player wins and dealer not
-                            player_results.append((player, "WINS", hand.get_score))
+                            result.append((player, "WINS", hand.get_score))
                             if self.is_blackjack(player.get_hand[0].cards):
                                 player.update_player_bet_rest(
                                     player.bet_current_round * -1
@@ -192,19 +192,19 @@ class Round:
                             and self._players[0].get_hand[0].get_score
                             == self._nearest_score
                         ):  # player and dealer win
-                            player_results.append((player, "PUSH", hand.get_score))
+                            result.append((player, "PUSH", hand.get_score))
                             player.update_player_bet_rest(0)
                             push_count += 1
                         else:
-                            player_results.append((player, "LOSE", hand.get_score))
+                            result.append((player, "LOSE", hand.get_score))
                             player.update_player_bet_rest(player.bet_current_round)
 
         if push_count == 1:
             # if dealer has the nearest score alone, he is the winner
-            player_results.append((player_results[0][0], "WINS", player_results[0][2]))
-            player_results.pop(0)
+            result.append((result[0][0], "WINS", result[0][2]))
+            result.pop(0)
 
-        return player_results
+        return result
 
     def print_result(self):
         """gets a list with players: score, name, result
@@ -275,7 +275,11 @@ class Round:
         return False
 
     def human_player_turn(self, hand_index):
-        """todo"""
+        """defines the logic for the players options
+
+            Args:
+                hand_index int: when player did spilt it has multiple hands
+        """
         print(
             self._current_player.get_name,
             " it is your turn. Current cards: ",
@@ -338,7 +342,7 @@ class Round:
 
         elif player_decision == "insurance":
             print("sorry, not implemented yet")
-            # todo https://www.bettingexpert.com/de/casino/blackjack/regeln
+            # https://www.bettingexpert.com/de/casino/blackjack/regeln
 
         print("")
 
